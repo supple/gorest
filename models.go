@@ -73,6 +73,5 @@ func (ca* CacheArr) GetNames() map[string]string {
         names[cmp.Id] = cmp.Name
     }
     mu.RUnlock()
-
     return names
 }
