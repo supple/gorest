@@ -1,0 +1,3 @@
+vendors:
+- path: github.com/zenazn/goji
+  rev: 64eb34159fe53473206c2b3e70fe396a639452f2
