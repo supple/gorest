@@ -38,6 +38,8 @@ func CampaignList(c web.C, w http.ResponseWriter, r *http.Request) {
 func CampaignAdd(c web.C, w http.ResponseWriter, r *http.Request) {
     cmp := Campaign{}
     decoder := json.NewDecoder(r.Body)
+    defer r.Body.Close()
+
     if err := decoder.Decode(&cmp); err != nil {
         http.Error(w, http.StatusText(422), 422)
         return
