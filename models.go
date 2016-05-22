@@ -11,7 +11,7 @@ var (
 
 // Helper random string generator
 var letters = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
-func randSeq(n int) string {
+func RandSeq(n int) string {
     b := make([]rune, n)
     for i := range b {
         b[i] = letters[rand.Intn(len(letters))]
@@ -19,11 +19,12 @@ func randSeq(n int) string {
     return string(b)
 }
 
+// # Model: AppService
 type AppService struct {
     ca *CacheArr
 }
 
-// Campaign object
+// # Model: Campaign object
 type Campaign struct {
     Id string `json:"id"`
     Name string `json:"name"`
@@ -33,7 +34,7 @@ func NewCampaign(id string, name string) *Campaign {
     return &Campaign{Id: id, Name: name}
 }
 
-// Cache, campaign id -> *Campaign
+// # Model: Cache, campaign id -> *Campaign
 type CacheArr struct {
     campaigns map[string]*Campaign
 }
@@ -42,7 +43,7 @@ func NewCacheArr(names []string) *CacheArr {
     ca := CacheArr{}
     ca.campaigns = make(map[string]*Campaign, len(names))
     for _, name := range names {
-        id := randSeq(5)
+        id := RandSeq(5)
         ca.campaigns[id] = NewCampaign(id, name)
     }
 
@@ -74,4 +75,15 @@ func (ca* CacheArr) GetNames() map[string]string {
     }
     mu.RUnlock()
     return names
+}
+
+// # Model: User
+
+type User struct {
+    id string
+    appId string
+    os string
+    appVersion string
+    token string
+    email string
 }
