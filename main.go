@@ -82,7 +82,7 @@ func metrics(c web.C, w http.ResponseWriter, r *http.Request) {
 
 
 var (
-    counter       *ratecounter.RateCounter
+    counter *ratecounter.RateCounter
     hitsperminute = expvar.NewInt("hits_per_minute")
 )
 
@@ -94,6 +94,8 @@ func increment(w http.ResponseWriter, r *http.Request) {
 
 func main() {
     fmt.Println("v1.0.0")
+    counter = ratecounter.NewRateCounter(1 * time.Minute)
+
     InitCache(&app)
 
     goji.DefaultMux.Abandon(middleware.Logger)
