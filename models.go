@@ -3,10 +3,15 @@ package main
 import (
     "sync"
     "math/rand"
+    "reflect"
+    "fmt"
+    "bytes"
+    "unicode"
+    "unicode/utf8"
 )
 
 var (
-    mu     sync.RWMutex
+    mu sync.RWMutex
 )
 
 // Helper random string generator
@@ -19,28 +24,81 @@ func randSeq(n int) string {
     return string(b)
 }
 
+func updateModel(c interface{}, data map[string]interface{}) {
+
+    for k, v := range  data {
+        // public field name in struct
+        fieldName := ucfirst(k)
+        vDst := reflect.ValueOf(c).Elem().FieldByName(fieldName)
+        vSrc := reflect.ValueOf(v)
+        if !vDst.CanSet() {
+            continue
+        }
+
+        if vDst.Type() != vSrc.Type() {
+            t := vDst.Kind()
+            switch t {
+            case reflect.Int32:
+                switch knd := vSrc.Kind(); knd {
+                case reflect.Int:
+                    if vp, okp  := v.(int); okp {
+                        vDst.SetInt(int64(vp))
+                    }
+                case reflect.Float64:
+                    if vp, okp := v.(float64); okp {
+                        vDst.SetInt(int64(vp))
+                    }
+                }
+                fmt.Printf("SET fieldName: %s, %d, dt: %s,\n", k, v, vSrc.Kind())
+            }
+        } else {
+            vDst.Set(vSrc)
+        }
+    }
+}
+
 type AppService struct {
     ca *CacheArr
 }
 
+func ucfirst(s string) string {
+    r, size := utf8.DecodeRuneInString(s)
+    buf := &bytes.Buffer{}
+    buf.WriteRune(unicode.ToUpper(r))
+    buf.WriteString(s[size:])
+    return buf.String()
+}
+
+type Object struct {
+    Id string `json:"id,omitempty"`
+}
+
 // Campaign object
-type Campaign struct {
-    Id string `json:"id"`
-    Name string `json:"name"`
+type Device struct {
+    Name string `json:"name,omitempty"`
+    Description string `json:"description,omitempty"`
+    Version int32 `json:"version,omitempty"`
+    Object
 }
 
-func NewCampaign(id string, name string) *Campaign {
-    return &Campaign{Id: id, Name: name}
+func NewCampaign(id string, name string) *Device {
+    d := &Device{Name: name}
+    d.Id = id
+    return d
 }
 
-// Cache, campaign id -> *Campaign
+func (c *Device) Update(data map[string]interface{})  {
+    updateModel(c, data)
+}
+
+// Cache, campaign id -> *Device
 type CacheArr struct {
-    campaigns map[string]*Campaign
+    campaigns map[string]*Device
 }
 
 func NewCacheArr(names []string) *CacheArr {
     ca := CacheArr{}
-    ca.campaigns = make(map[string]*Campaign, len(names))
+    ca.campaigns = make(map[string]*Device, len(names))
     for _, name := range names {
         id := randSeq(5)
         ca.campaigns[id] = NewCampaign(id, name)
@@ -50,7 +108,7 @@ func NewCacheArr(names []string) *CacheArr {
 }
 
 // Get returns campaign, or nil if there's no one.
-func (ca* CacheArr) Get(id string) *Campaign {
+func (ca* CacheArr) Get(id string) *Device {
     mu.RLock()
     cmp := ca.campaigns[id]
     mu.RUnlock()
@@ -59,7 +117,14 @@ func (ca* CacheArr) Get(id string) *Campaign {
 }
 
 // Set campaign in cache
-func (ca* CacheArr) Set(pCmp *Campaign) {
+func (ca* CacheArr) Set(pCmp *Device) {
+    mu.Lock()
+    ca.campaigns[pCmp.Id] = pCmp
+    mu.Unlock()
+}
+
+// Update campaign in cache
+func (ca* CacheArr) Update(pCmp *Device) {
     mu.Lock()
     ca.campaigns[pCmp.Id] = pCmp
     mu.Unlock()
