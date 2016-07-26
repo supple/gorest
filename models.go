@@ -58,7 +58,7 @@ func updateModel(c interface{}, data map[string]interface{}) {
 }
 
 type AppService struct {
-    ca *CacheArr
+    ca *MemStorage
 }
 
 func ucfirst(s string) string {
@@ -73,7 +73,7 @@ type Object struct {
     Id string `json:"id,omitempty"`
 }
 
-// Campaign object
+// Device object
 type Device struct {
     Name string `json:"name,omitempty"`
     Description string `json:"description,omitempty"`
@@ -81,7 +81,7 @@ type Device struct {
     Object
 }
 
-func NewCampaign(id string, name string) *Device {
+func NewDevice(id string, name string) *Device {
     d := &Device{Name: name}
     d.Id = id
     return d
@@ -91,51 +91,55 @@ func (c *Device) Update(data map[string]interface{})  {
     updateModel(c, data)
 }
 
-// Cache, campaign id -> *Device
-type CacheArr struct {
-    campaigns map[string]*Device
+func (c *Device) ToString() string {
+    return c.Name
 }
 
-func NewCacheArr(names []string) *CacheArr {
-    ca := CacheArr{}
-    ca.campaigns = make(map[string]*Device, len(names))
+// Cache, id -> *Object
+type MemStorage struct {
+    objects map[string]*Device
+}
+
+func NewMemStorage(names []string) *MemStorage {
+    ca := MemStorage{}
+    ca.objects = make(map[string]*Device, len(names))
     for _, name := range names {
         id := randSeq(5)
-        ca.campaigns[id] = NewCampaign(id, name)
+        ca.objects[id] = NewDevice(id, name)
     }
 
     return &ca
 }
 
-// Get returns campaign, or nil if there's no one.
-func (ca* CacheArr) Get(id string) *Device {
+// Get returns object, or nil if there's no one.
+func (ca* MemStorage) Get(id string) *Device {
     mu.RLock()
-    cmp := ca.campaigns[id]
+    cmp := ca.objects[id]
     mu.RUnlock()
 
     return cmp
 }
 
-// Set campaign in cache
-func (ca* CacheArr) Set(pCmp *Device) {
+// Set object in storage
+func (ca* MemStorage) Set(pCmp *Device) {
     mu.Lock()
-    ca.campaigns[pCmp.Id] = pCmp
+    ca.objects[pCmp.Id] = pCmp
     mu.Unlock()
 }
 
-// Update campaign in cache
-func (ca* CacheArr) Update(pCmp *Device) {
+// Update object in storage
+func (ca* MemStorage) Update(obj *Device) {
     mu.Lock()
-    ca.campaigns[pCmp.Id] = pCmp
+    ca.objects[obj.Id] = obj
     mu.Unlock()
 }
 
-// Get campaign names with ids
-func (ca* CacheArr) GetNames() map[string]string {
+// Get object names with ids
+func (ca* MemStorage) GetNames() map[string]string {
     names := make(map[string]string)
     mu.RLock()
-    for _, cmp := range ca.campaigns {
-        names[cmp.Id] = cmp.Name
+    for _, obj := range ca.objects {
+        names[obj.Id] = obj.ToString()
     }
     mu.RUnlock()
     return names

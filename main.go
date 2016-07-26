@@ -22,7 +22,7 @@ func jsonResponse(w http.ResponseWriter, data interface{}) {
 
 func InitCache(app *AppService) {
     names := []string{"Alpha", "Beta", "Sigma"}
-    app.ca = NewCacheArr(names)
+    app.ca = NewMemStorage(names)
 }
 
 func CampaignGet(c web.C, w http.ResponseWriter, r *http.Request) {
@@ -59,11 +59,11 @@ func CampaignUpdate(c web.C, w http.ResponseWriter, r *http.Request) {
     }
 
     var id = c.URLParams["id"]
-    cmp := app.ca.Get(id)
-    cmp.Update(tmp)
+    obj := app.ca.Get(id)
+    obj.Update(tmp)
 
-    app.ca.Set(cmp)
-    jsonResponse(w, cmp)
+    app.ca.Set(obj)
+    jsonResponse(w, obj)
 }
 
 func main() {
