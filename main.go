@@ -27,8 +27,8 @@ func InitCache(app *AppService) {
 
 func CampaignGet(c web.C, w http.ResponseWriter, r *http.Request) {
     var id = c.URLParams["id"]
-    campaign := app.Storage.Get(id)
-    jsonResponse(w, campaign)
+    obj := app.Storage.Get(id)
+    jsonResponse(w, obj)
 }
 
 func CampaignList(c web.C, w http.ResponseWriter, r *http.Request) {
@@ -37,15 +37,15 @@ func CampaignList(c web.C, w http.ResponseWriter, r *http.Request) {
 }
 
 func CampaignAdd(c web.C, w http.ResponseWriter, r *http.Request) {
-    cmp := Device{}
+    obj := Device{}
     decoder := json.NewDecoder(r.Body)
-    if err := decoder.Decode(&cmp); err != nil {
+    if err := decoder.Decode(&obj); err != nil {
         log.Print(err.Error())
         http.Error(w, http.StatusText(422), 422)
         return
     }
-    app.Storage.Set(&cmp)
-    jsonResponse(w, cmp)
+    app.Storage.Set(&obj)
+    jsonResponse(w, obj)
 }
 
 // https://github.com/quintans/goSQL#update
