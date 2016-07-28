@@ -22,17 +22,17 @@ func jsonResponse(w http.ResponseWriter, data interface{}) {
 
 func InitCache(app *AppService) {
     names := []string{"Alpha", "Beta", "Sigma"}
-    app.ca = NewMemStorage(names)
+    app.Storage = NewMemStorage(names)
 }
 
 func CampaignGet(c web.C, w http.ResponseWriter, r *http.Request) {
     var id = c.URLParams["id"]
-    campaign := app.ca.Get(id)
+    campaign := app.Storage.Get(id)
     jsonResponse(w, campaign)
 }
 
 func CampaignList(c web.C, w http.ResponseWriter, r *http.Request) {
-    names := app.ca.GetNames()
+    names := app.Storage.GetNames()
     jsonResponse(w, names)
 }
 
@@ -44,7 +44,7 @@ func CampaignAdd(c web.C, w http.ResponseWriter, r *http.Request) {
         http.Error(w, http.StatusText(422), 422)
         return
     }
-    app.ca.Set(&cmp)
+    app.Storage.Set(&cmp)
     jsonResponse(w, cmp)
 }
 
@@ -59,10 +59,10 @@ func CampaignUpdate(c web.C, w http.ResponseWriter, r *http.Request) {
     }
 
     var id = c.URLParams["id"]
-    obj := app.ca.Get(id)
+    obj := app.Storage.Get(id)
     obj.Update(tmp)
 
-    app.ca.Set(obj)
+    app.Storage.Set(obj)
     jsonResponse(w, obj)
 }
 

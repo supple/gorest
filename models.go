@@ -34,18 +34,16 @@ func updateModel(c interface{}, data map[string]interface{}) {
         if !vDst.CanSet() {
             continue
         }
-
         if vDst.Type() != vSrc.Type() {
-            t := vDst.Kind()
-            switch t {
+            switch tDst := vDst.Kind(); tDst {
             case reflect.Int32:
-                switch knd := vSrc.Kind(); knd {
+                switch tSrc := vSrc.Kind(); tSrc {
                 case reflect.Int:
-                    if vp, okp  := v.(int); okp {
+                    if vp, ok := v.(int); ok {
                         vDst.SetInt(int64(vp))
                     }
                 case reflect.Float64:
-                    if vp, okp := v.(float64); okp {
+                    if vp, ok := v.(float64); ok {
                         vDst.SetInt(int64(vp))
                     }
                 }
@@ -58,7 +56,7 @@ func updateModel(c interface{}, data map[string]interface{}) {
 }
 
 type AppService struct {
-    ca *MemStorage
+    Storage *MemStorage
 }
 
 func ucfirst(s string) string {
