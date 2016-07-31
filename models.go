@@ -14,6 +14,10 @@ var (
     mu sync.RWMutex
 )
 
+func init() {
+    fmt.Println("Models init")
+}
+
 // Helper random string generator
 var letters = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
 func randSeq(n int) string {
@@ -24,8 +28,15 @@ func randSeq(n int) string {
     return string(b)
 }
 
-func updateModel(c interface{}, data map[string]interface{}) {
+func ucfirst(s string) string {
+    r, size := utf8.DecodeRuneInString(s)
+    buf := &bytes.Buffer{}
+    buf.WriteRune(unicode.ToUpper(r))
+    buf.WriteString(s[size:])
+    return buf.String()
+}
 
+func updateModel(c interface{}, data map[string]interface{}) {
     for k, v := range  data {
         // public field name in struct
         fieldName := ucfirst(k)
@@ -36,6 +47,7 @@ func updateModel(c interface{}, data map[string]interface{}) {
         }
         if vDst.Type() != vSrc.Type() {
             switch tDst := vDst.Kind(); tDst {
+            // try set Int32
             case reflect.Int32:
                 switch tSrc := vSrc.Kind(); tSrc {
                 case reflect.Int:
@@ -59,24 +71,13 @@ type AppService struct {
     Storage *MemStorage
 }
 
-func ucfirst(s string) string {
-    r, size := utf8.DecodeRuneInString(s)
-    buf := &bytes.Buffer{}
-    buf.WriteRune(unicode.ToUpper(r))
-    buf.WriteString(s[size:])
-    return buf.String()
-}
-
-type Object struct {
-    Id string `json:"id,omitempty"`
-}
 
 // Device object
 type Device struct {
     Name string `json:"name,omitempty"`
     Description string `json:"description,omitempty"`
     Version int32 `json:"version,omitempty"`
-    Object
+    Id string `json:"id,omitempty"`
 }
 
 func NewDevice(id string, name string) *Device {
@@ -89,56 +90,4 @@ func (c *Device) Update(data map[string]interface{})  {
     updateModel(c, data)
 }
 
-func (c *Device) ToString() string {
-    return c.Name
-}
 
-// Cache, id -> *Object
-type MemStorage struct {
-    objects map[string]*Device
-}
-
-func NewMemStorage(names []string) *MemStorage {
-    ca := MemStorage{}
-    ca.objects = make(map[string]*Device, len(names))
-    for _, name := range names {
-        id := randSeq(5)
-        ca.objects[id] = NewDevice(id, name)
-    }
-
-    return &ca
-}
-
-// Get returns object, or nil if there's no one.
-func (ca* MemStorage) Get(id string) *Device {
-    mu.RLock()
-    cmp := ca.objects[id]
-    mu.RUnlock()
-
-    return cmp
-}
-
-// Set object in storage
-func (ca* MemStorage) Set(pCmp *Device) {
-    mu.Lock()
-    ca.objects[pCmp.Id] = pCmp
-    mu.Unlock()
-}
-
-// Update object in storage
-func (ca* MemStorage) Update(obj *Device) {
-    mu.Lock()
-    ca.objects[obj.Id] = obj
-    mu.Unlock()
-}
-
-// Get object names with ids
-func (ca* MemStorage) GetNames() map[string]string {
-    names := make(map[string]string)
-    mu.RLock()
-    for _, obj := range ca.objects {
-        names[obj.Id] = obj.ToString()
-    }
-    mu.RUnlock()
-    return names
-}

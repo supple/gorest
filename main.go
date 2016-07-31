@@ -21,8 +21,8 @@ func jsonResponse(w http.ResponseWriter, data interface{}) {
 }
 
 func InitCache(app *AppService) {
-    names := []string{"Alpha", "Beta", "Sigma"}
-    app.Storage = NewMemStorage(names)
+    //names := []string{"Alpha", "Beta", "Sigma"}\
+    app.Storage = NewMemStorage()
 }
 
 func CampaignGet(c web.C, w http.ResponseWriter, r *http.Request) {
@@ -32,7 +32,7 @@ func CampaignGet(c web.C, w http.ResponseWriter, r *http.Request) {
 }
 
 func CampaignList(c web.C, w http.ResponseWriter, r *http.Request) {
-    names := app.Storage.GetNames()
+    names := app.Storage.GetByCriteria()
     jsonResponse(w, names)
 }
 
@@ -44,7 +44,7 @@ func CampaignAdd(c web.C, w http.ResponseWriter, r *http.Request) {
         http.Error(w, http.StatusText(422), 422)
         return
     }
-    app.Storage.Set(&obj)
+    app.Storage.Set(obj.Id, &obj)
     jsonResponse(w, obj)
 }
 
@@ -59,10 +59,10 @@ func CampaignUpdate(c web.C, w http.ResponseWriter, r *http.Request) {
     }
 
     var id = c.URLParams["id"]
-    obj := app.Storage.Get(id)
+    obj := app.Storage.Get(id).(*Device)
     obj.Update(tmp)
 
-    app.Storage.Set(obj)
+    app.Storage.Set(id, obj)
     jsonResponse(w, obj)
 }
 
