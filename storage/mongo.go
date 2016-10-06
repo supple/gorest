@@ -5,7 +5,6 @@ import (
 	"fmt"
 )
 
-
 func NewMongo(url string, dbName string) *Mongo {
 	session, err := mgo.Dial(url)
 	if err != nil {

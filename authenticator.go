@@ -12,7 +12,13 @@ type Device struct {
 	Id       string `json:"id" bson:"_id"`
 	AppId    string        `json:"name" bson:"name" `
 	AppToken string        `json:"appToken" bson:"appToken"`
+    AppVersion int32       `json:"appVersion" bson:"appVersion"`
 }
+
+func (c *Device) Update(data map[string]interface{})  {
+	updateModel(c, data)
+}
+
 
 type App struct {
 	Id     string `json:"id" bson:"_id"`

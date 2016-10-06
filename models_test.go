@@ -33,12 +33,14 @@ func TestUpdateModel(t *testing.T) {
 
 func TestUpdateDevice(t *testing.T) {
     mp := make(map[string]interface{})
-    mp["name"] = "a"
-    mp["Version"] = 1234
+    mp["AppId"] = "a"
+    mp["AppVersion"] = 1234
+    mp["AppToken"] = 1234
+
     md := &Device{}
 
     var v32 int32 = 1234
     updateModel(md, mp)
-    if (md.Name != "a") { t.Fatalf("Fail name: %s", md.Name) }
-    if (md.Version != v32) { t.Fatalf("Fail version: %s", md.Version) }
+    if (md.AppId != "a") { t.Fatalf("Fail name: %s", md.AppId) }
+    if (md.AppVersion != v32) { t.Fatalf("Fail version: %s", md.AppVersion) }
 }

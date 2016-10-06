@@ -61,22 +61,4 @@ type AppService struct {
     Storage *MemStorage
 }
 
-// Device object
-type Device struct {
-    Name string `json:"name,omitempty"`
-    Description string `json:"description,omitempty"`
-    Version int32 `json:"version,omitempty"`
-    Id string `json:"id,omitempty"`
-}
-
-func NewDevice(id string, name string) *Device {
-    d := &Device{Name: name}
-    d.Id = id
-    return d
-}
-
-func (c *Device) Update(data map[string]interface{})  {
-    updateModel(c, data)
-}
-
 

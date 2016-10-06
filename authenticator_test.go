@@ -24,15 +24,15 @@ func TestFlow(t *testing.T) {
 	var err error
 	var c *r.Customer
 
+	// set up db
 	err = rp.Install(db)
 	if (err != nil) { fmt.Println(err) }
-
 	err = akRp.Install(db)
 	if (err != nil) { fmt.Println(err) }
 
 	// delete if there is some old ones
 	id := "67158007-b5ff-495f-83bf-36867429a731"
-	apiKeyStr := "pOlqDsToiIdZAoCmNexYNubE-sozgdHsN"
+	apiKeyStr := "OiBTGDVxmZnZHAITDMjqyQRJ-cElsforb"
 
 	err = rp.Delete(db, id)
 	a.True(t, err == nil)
@@ -66,7 +66,6 @@ func TestFlow(t *testing.T) {
 	a.True(t, err == nil)
 
 	fmt.Println("ApiKey: " + ak.Key)
-
 
 	cc, err := Auth(db, apiKeyStr, at)
 	a.True(t, cc != nil)
