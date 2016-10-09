@@ -8,48 +8,50 @@ import (
 )
 
 type Customer struct {
-	Id   string `json:"id" bson:"_id"`
+    Id string `json:"id" bson:"_id"`
 	Hash string `json:"hash" bson:"hash"`
 	Name string `json:"name" bson:"name"`
 }
 
 // ### -- Customer repo
 
-type CustomerRP struct{}
+type CustomerRP struct{
+    gt *Gateway
+}
+
+func NewCustomerRP() *CustomerRP {
+    rp := &CustomerRP{}
+    gt := &Gateway{collectionName: rp.CollectionName()}
+    rp.gt = gt
+
+    return rp
+}
 
 func (rp *CustomerRP) Create(db *s.Mongo, model *Customer) error {
-	if (len(model.Id) == 0) {
-		model.Id = lc.NewId()
-	}
-	model.Hash = lc.RandString(8)
-	err := db.Coll(rp.CollectionName()).Insert(model)
-	return err
+    model.Hash = lc.RandString(8)
+    return rp.gt.Insert(db, model)
+}
+
+func (rp *CustomerRP) Update(db *s.Mongo, id string, model *map[string]interface{}) error {
+    err := db.Coll(rp.CollectionName()).Update(bson.M{"_id": id}, model)
+    return err
 }
 
 func (rp *CustomerRP) FindOne(db *s.Mongo, id string) (*Customer, error) {
 	result := &Customer{}
-	q := bson.M{"_id": id}
-	err := db.Coll(rp.CollectionName()).Find(q).One(result)
-	if err != nil {
-		return nil, err
-	}
+    err := rp.gt.FindById(db, id, result)
 
 	return result, err
 }
 
 func (rp *CustomerRP) FindOneBy(db *s.Mongo, conditions bson.M) (*Customer, error) {
 	result := &Customer{}
-	err := db.Coll(rp.CollectionName()).Find(conditions).One(result)
-	if err != nil {
-		return nil, err
-	}
-
+    err := rp.gt.FindOneBy(db, conditions, result)
 	return result, err
 }
 
 func (rp *CustomerRP) Delete(db *s.Mongo, id string) (error) {
-	q := bson.M{"_id": id}
-	err := db.Coll(rp.CollectionName()).Remove(q)
+	err := rp.gt.Remove(db, id)
 	return err
 }
 

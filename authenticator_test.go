@@ -18,15 +18,20 @@ func TestFlow(t *testing.T) {
 
 	db := s.NewMongo("localhost:27017", "lcache")
 
-	rp := r.CustomerRP{}
-	akRp := r.ApiKeyRP{}
+	cRp := r.NewCustomerRP()
+	akRp := r.NewApiKeyRP()
 
 	var err error
 	var c *r.Customer
 
+	enil := func(value interface{}) {
+        a.True(t, value == nil)
+        if (value != nil) { fmt.Println(value) }
+    }
 	// set up db
-	err = rp.Install(db)
-	if (err != nil) { fmt.Println(err) }
+	err = cRp.Install(db)
+    enil(err)
+
 	err = akRp.Install(db)
 	if (err != nil) { fmt.Println(err) }
 
@@ -34,33 +39,30 @@ func TestFlow(t *testing.T) {
 	id := "67158007-b5ff-495f-83bf-36867429a731"
 	apiKeyStr := "OiBTGDVxmZnZHAITDMjqyQRJ-cElsforb"
 
-	err = rp.Delete(db, id)
-	a.True(t, err == nil)
-
 	// find non existing
-	c, err = rp.FindOne(db, id)
+	c, err = cRp.FindOne(db, id)
 	a.True(t, err == mgo.ErrNotFound)
-	a.True(t, c == nil)
+	//enil(c)
 
 	// save
 	model := &r.Customer{}
 	model.Id = id
 	model.Name = "marek"
-	err = rp.Create(db, model)
-	a.True(t, err == nil)
+	err = cRp.Create(db, model)
+    enil(err)
 
 	// repeat
 	model.Id = lc.NewId()
-	err = rp.Create(db, model)
+	err = cRp.Create(db, model)
 	a.True(t, err != nil)
 
 	// find
-	c, err = rp.FindOne(db, id)
+	c, err = cRp.FindOne(db, id)
 	a.True(t, c.Name == "marek")
 	a.True(t, err == nil)
 
 	// create api key
-	ak := &r.ApiKey{CustomerName: model.Name}
+	ak := &r.ApiKey{CustomerName: model.Name, Key: apiKeyStr}
 	err = akRp.Create(db, ak)
 	if (err != nil) { fmt.Println(err) }
 	a.True(t, err == nil)
@@ -68,7 +70,13 @@ func TestFlow(t *testing.T) {
 	fmt.Println("ApiKey: " + ak.Key)
 
 	cc, err := Auth(db, apiKeyStr, at)
+    if (err != nil) { fmt.Println(err) }
 	a.True(t, cc != nil)
 
-	fmt.Println(ak.Id)
+	fmt.Println("ApiKey Id: " + ak.Id)
+    akRp.Delete(db, ak.Id)
+
+    // delete customer
+    err = cRp.Delete(db, id)
+    enil(err)
 }

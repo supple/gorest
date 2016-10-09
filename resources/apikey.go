@@ -16,7 +16,7 @@ type ApiKey struct {
 }
 
 func (rp *ApiKeyRP) ConstraintsValidation(db *s.Mongo, model *ApiKey) (*Customer, error) {
-    csRp := CustomerRP{}
+    csRp := NewCustomerRP()
     c, err := csRp.FindOneBy(db, bson.M{"name": model.CustomerName})
     if (c == nil) {
         return nil, ErrNotFound
@@ -26,7 +26,17 @@ func (rp *ApiKeyRP) ConstraintsValidation(db *s.Mongo, model *ApiKey) (*Customer
 }
 
 // ### -- ApiKey repo
-type ApiKeyRP struct{}
+type ApiKeyRP struct {
+    gt *Gateway
+}
+
+func NewApiKeyRP() *ApiKeyRP {
+    rp := &ApiKeyRP{}
+    gt := &Gateway{collectionName: rp.CollectionName()}
+    rp.gt = gt
+
+    return rp
+}
 
 func (rp *ApiKeyRP) Create(db *s.Mongo, model *ApiKey) error {
     var err error
@@ -41,14 +51,15 @@ func (rp *ApiKeyRP) Create(db *s.Mongo, model *ApiKey) error {
     }
 
     // create ids if not set
-    if (len(model.Id) == 0) {
-        model.Id = lc.NewId()
-    }
+    //if (len(model.Id) == 0) {
+    //    model.Id = lc.NewId()
+    //}
     if (len(model.Key) == 0) {
         model.Key = fmt.Sprintf("%s-%s", lc.RandString(24), customer.Hash)
     }
 
-    err = db.Coll(rp.CollectionName()).Insert(model)
+    err = rp.gt.Insert(db, model)
+    //err = db.Coll(rp.CollectionName()).Insert(model)
 
     return err
 }
@@ -65,6 +76,11 @@ func (rp *ApiKeyRP) FindOneBy(db *s.Mongo, conditions bson.M) (*ApiKey, error) {
     }
 
     return result, err
+}
+
+func (rp *ApiKeyRP) Delete(db *s.Mongo, id string) (error) {
+    err := rp.gt.Remove(db, id)
+    return err
 }
 
 func (rp *ApiKeyRP) Install(db *s.Mongo) error {
