@@ -14,16 +14,12 @@ type Gateway struct {
 
 func (gt *Gateway) Insert(db *s.Mongo, model interface{}) error {
 
-    // vDst := reflect.ValueOf(model).Elem().FieldByName("Id")
+    // generate id
     vDst := reflect.Indirect(reflect.ValueOf(model)).FieldByName("Id")
     if (vDst.Len() == 0) {
         vDst.SetString(lc.NewId())
     }
 
-    //fmt.Println(model)
-    //if (len(model.(*Base).Id) == 0) {
-    //    model.(*Base).Id = lc.NewId()
-    //}
     err := db.Coll(gt.collectionName).Insert(model)
     return err
 }

@@ -8,6 +8,7 @@ import (
     "github.com/zenazn/goji/web"
     "github.com/zenazn/goji/web/middleware"
     "log"
+    "github.com/supple/gorest/resources"
 )
 
 var app = AppService{}
@@ -37,7 +38,7 @@ func CampaignList(c web.C, w http.ResponseWriter, r *http.Request) {
 }
 
 func CampaignAdd(c web.C, w http.ResponseWriter, r *http.Request) {
-    obj := Device{}
+    obj := resources.Device{}
     decoder := json.NewDecoder(r.Body)
     if err := decoder.Decode(&obj); err != nil {
         log.Print(err.Error())
@@ -59,7 +60,7 @@ func CampaignUpdate(c web.C, w http.ResponseWriter, r *http.Request) {
     }
 
     var id = c.URLParams["id"]
-    obj := app.Storage.Get(id).(*Device)
+    obj := app.Storage.Get(id).(*resources.Device)
     obj.Update(tmp)
 
     app.Storage.Set(id, obj)

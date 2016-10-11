@@ -7,25 +7,11 @@ import (
 )
 
 
-// User represents the structure of our resource
-type Device struct {
-	Id       string `json:"id" bson:"_id"`
-	AppId    string        `json:"name" bson:"name" `
-	AppToken string        `json:"appToken" bson:"appToken"`
-    AppVersion int32       `json:"appVersion" bson:"appVersion"`
-}
-
-func (c *Device) Update(data map[string]interface{})  {
-	updateModel(c, data)
-}
-
-
 type App struct {
 	Id     string `json:"id" bson:"_id"`
 	Name   string        `json:"name" bson:"name"`
 	GcmKey string        `json:"gcmKey" bson:"gcmKey"`
 }
-
 
 
 //// CreateUser creates a new user resource
@@ -54,7 +40,7 @@ type App struct {
 
 func Auth(db *s.Mongo, apiKey string, accessTo r.AccessTo) (*r.CustomerContext, error) {
 	var cc *r.CustomerContext
-	akRp := r.ApiKeyRP{}
+	akRp := r.NewApiKeyRP()
 	ak, err := akRp.FindOneBy(db, bson.M{"key": apiKey})
 	// @todo: hasAccess(accessTo)
 	if err == nil {

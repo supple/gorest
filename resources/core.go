@@ -14,9 +14,11 @@ var (
 	ErrNotFound = errors.New("not found")
 )
 
-//type Base struct {
-//    Id string `json:"id" bson:"_id"`
-//}
+type Base struct {}
+
+func (c *Base) Update(data map[string]interface{}) {
+    updateModel(c, data)
+}
 
 type Repository interface {
 	Create(db *s.Mongo, model interface{}) (error)
@@ -24,7 +26,6 @@ type Repository interface {
 	FindOne(id string) (interface{}, error)
 	CollectionName() string
 }
-
 
 
 type AccessTo struct {

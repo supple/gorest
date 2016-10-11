@@ -56,7 +56,7 @@ func (rp *CustomerRP) Delete(db *s.Mongo, id string) (error) {
 }
 
 func (rp CustomerRP) CollectionName() string {
-	return "CustomerRP"
+	return "Customer"
 }
 
 func (rp *CustomerRP) Install(db *s.Mongo) error {
