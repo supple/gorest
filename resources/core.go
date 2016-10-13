@@ -11,18 +11,32 @@ import (
 )
 
 var (
-	ErrNotFound = errors.New("not found")
+	ErrNotFound = errors.New("Object not found")
 )
+
+type ErrObjectNotFound struct {
+    object string
+    value string
+}
+func (e *ErrObjectNotFound) Error() string {
+    return fmt.Sprintf("Object not found: %s, value: %s", e.object, e.value)
+}
 
 type Base struct {}
 
-func (c *Base) Update(data map[string]interface{}) {
-    updateModel(c, data)
+type CustomerBased struct {
+    Base        `bson:",inline"`
+    Id           string `json:"id" bson:"_id"`
+    CustomerName string `json:"customerName" bson:"customerName" validate:"required"`
+}
+
+func CustomerValidator() {
+
 }
 
 type Repository interface {
-	Create(db *s.Mongo, model interface{}) (error)
-	Update(db *s.Mongo, id string, model interface{})
+	Create(db *s.MongoDB, model interface{}) (error)
+	Update(db *s.MongoDB, id string, model interface{})
 	FindOne(id string) (interface{}, error)
 	CollectionName() string
 }
@@ -47,11 +61,14 @@ func ucfirst(s string) string {
 }
 
 // c model to be updated
-func updateModel(c interface{}, data map[string]interface{}) {
+func UpdateModel(c interface{}, data map[string]interface{}) {
     for k, v := range  data {
         // public field name in struct
         fieldName := ucfirst(k)
-        vDst := reflect.ValueOf(c).Elem().FieldByName(fieldName)
+
+        //vDst := reflect.ValueOf(c).Elem().FieldByName(fieldName)
+        vDst := reflect.Indirect(reflect.ValueOf(c)).FieldByName(fieldName)
+        //fmt.Printf("%s %b \n", fieldName, vDst.CanSet())
         if !vDst.CanSet() {
             continue
         }
@@ -64,5 +81,6 @@ func updateModel(c interface{}, data map[string]interface{}) {
         } else {
             vDst.Set(vSrc)
         }
+
     }
 }

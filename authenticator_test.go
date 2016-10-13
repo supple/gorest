@@ -16,11 +16,17 @@ func TestFlow(t *testing.T) {
 	at := r.AccessTo{Resource:"device", Action: "create"}
 	//cc := Auth("xoz", at)
 
-	db := s.NewMongo("localhost:27017", "lcache")
+	db := s.GetInstance("entities")
+
 
 	cRp := r.NewCustomerRP()
 	akRp := r.NewApiKeyRP()
 
+    //
+    s.DropCollection(db, cRp.CollectionName())
+    s.DropCollection(db, akRp.CollectionName())
+
+    //
 	var err error
 	var c *r.Customer
 

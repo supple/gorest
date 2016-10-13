@@ -12,7 +12,7 @@ type Gateway struct {
     collectionName string
 }
 
-func (gt *Gateway) Insert(db *s.Mongo, model interface{}) error {
+func (gt *Gateway) Insert(db *s.MongoDB, model interface{}) error {
 
     // generate id
     vDst := reflect.Indirect(reflect.ValueOf(model)).FieldByName("Id")
@@ -24,20 +24,20 @@ func (gt *Gateway) Insert(db *s.Mongo, model interface{}) error {
     return err
 }
 
-func (gt *Gateway) Remove(db *s.Mongo, id string) (error) {
+func (gt *Gateway) Remove(db *s.MongoDB, id string) (error) {
     q := bson.M{"_id": id}
     err := db.Coll(gt.collectionName).Remove(q)
     return err
 }
 
-func (gt *Gateway) FindById(db *s.Mongo, id string, result interface{}) error {
+func (gt *Gateway) FindById(db *s.MongoDB, id string, result interface{}) error {
     q := bson.M{"_id": id}
     err := db.Coll(gt.collectionName).Find(q).One(result)
 
     return err
 }
 
-func (gt *Gateway) FindOneBy(db *s.Mongo, conditions bson.M, result interface{}) error {
+func (gt *Gateway) FindOneBy(db *s.MongoDB, conditions bson.M, result interface{}) error {
     err := db.Coll(gt.collectionName).Find(conditions).One(result)
     return err
 }

@@ -27,30 +27,37 @@ func NewCustomerRP() *CustomerRP {
     return rp
 }
 
-func (rp *CustomerRP) Create(db *s.Mongo, model *Customer) error {
+func (rp *CustomerRP) Create(db *s.MongoDB, model *Customer) error {
     model.Hash = lc.RandString(8)
     return rp.gt.Insert(db, model)
 }
 
-func (rp *CustomerRP) Update(db *s.Mongo, id string, model *map[string]interface{}) error {
+func (rp *CustomerRP) Update(db *s.MongoDB, id string, model *map[string]interface{}) error {
     err := db.Coll(rp.CollectionName()).Update(bson.M{"_id": id}, model)
     return err
 }
 
-func (rp *CustomerRP) FindOne(db *s.Mongo, id string) (*Customer, error) {
+func (rp *CustomerRP) FindOne(db *s.MongoDB, id string) (*Customer, error) {
 	result := &Customer{}
     err := rp.gt.FindById(db, id, result)
 
 	return result, err
 }
 
-func (rp *CustomerRP) FindOneBy(db *s.Mongo, conditions bson.M) (*Customer, error) {
+func (rp *CustomerRP) FindOneByName(db *s.MongoDB, customerName string) (*Customer, error) {
+	result := &Customer{}
+    conditions := bson.M{"name": customerName}
+	err := rp.gt.FindOneBy(db, conditions, result)
+	return result, err
+}
+
+func (rp *CustomerRP) FindOneBy(db *s.MongoDB, conditions bson.M) (*Customer, error) {
 	result := &Customer{}
     err := rp.gt.FindOneBy(db, conditions, result)
 	return result, err
 }
 
-func (rp *CustomerRP) Delete(db *s.Mongo, id string) (error) {
+func (rp *CustomerRP) Delete(db *s.MongoDB, id string) (error) {
 	err := rp.gt.Remove(db, id)
 	return err
 }
@@ -59,7 +66,7 @@ func (rp CustomerRP) CollectionName() string {
 	return "Customer"
 }
 
-func (rp *CustomerRP) Install(db *s.Mongo) error {
+func (rp *CustomerRP) Install(db *s.MongoDB) error {
 	index := mgo.Index{
 		Key: []string{"name"},
 		Unique: true,

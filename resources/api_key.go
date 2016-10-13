@@ -29,7 +29,7 @@ func NewApiKeyRP() *ApiKeyRP {
     return rp
 }
 
-func (rp *ApiKeyRP) Create(db *s.Mongo, model *ApiKey) error {
+func (rp *ApiKeyRP) Create(db *s.MongoDB, model *ApiKey) error {
     var err error
 
      // validate
@@ -51,26 +51,26 @@ func (rp *ApiKeyRP) Create(db *s.Mongo, model *ApiKey) error {
     return err
 }
 
-func (rp *ApiKeyRP) FindOne(db *s.Mongo, id string) (*ApiKey, error) {
+func (rp *ApiKeyRP) FindOne(db *s.MongoDB, id string) (*ApiKey, error) {
     result := &ApiKey{}
     err := rp.gt.FindById(db, id, result)
     return result, err
 }
 
-func (rp *ApiKeyRP) FindOneBy(db *s.Mongo, conditions bson.M) (*ApiKey, error) {
+func (rp *ApiKeyRP) FindOneBy(db *s.MongoDB, conditions bson.M) (*ApiKey, error) {
     result := &ApiKey{}
     err := rp.gt.FindOneBy(db, conditions, result)
     return result, err
 }
 
-func (rp *ApiKeyRP) Delete(db *s.Mongo, id string) (error) {
+func (rp *ApiKeyRP) Delete(db *s.MongoDB, id string) (error) {
     err := rp.gt.Remove(db, id)
     return err
 }
 
-func (rp *ApiKeyRP) ConstraintsValidation(db *s.Mongo, model *ApiKey) (*Customer, error) {
+func (rp *ApiKeyRP) ConstraintsValidation(db *s.MongoDB, model *ApiKey) (*Customer, error) {
     csRp := NewCustomerRP()
-    c, err := csRp.FindOneBy(db, bson.M{"name": model.CustomerName})
+    c, err := csRp.FindOneByName(db, model.CustomerName)
     if (c == nil) {
         return nil, ErrNotFound
     }
@@ -83,7 +83,7 @@ func (rp ApiKeyRP) CollectionName() string {
 }
 
 
-func (rp *ApiKeyRP) Install(db *s.Mongo) error {
+func (rp *ApiKeyRP) Install(db *s.MongoDB) error {
     var index mgo.Index
     var err error
 

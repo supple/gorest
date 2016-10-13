@@ -38,7 +38,7 @@ type App struct {
 //}
 
 
-func Auth(db *s.Mongo, apiKey string, accessTo r.AccessTo) (*r.CustomerContext, error) {
+func Auth(db *s.MongoDB, apiKey string, accessTo r.AccessTo) (*r.CustomerContext, error) {
 	var cc *r.CustomerContext
 	akRp := r.NewApiKeyRP()
 	ak, err := akRp.FindOneBy(db, bson.M{"key": apiKey})

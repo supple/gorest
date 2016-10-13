@@ -61,7 +61,7 @@ func CampaignUpdate(c web.C, w http.ResponseWriter, r *http.Request) {
 
     var id = c.URLParams["id"]
     obj := app.Storage.Get(id).(*resources.Device)
-    obj.Update(tmp)
+    resources.UpdateModel(obj, tmp)
 
     app.Storage.Set(id, obj)
     jsonResponse(w, obj)

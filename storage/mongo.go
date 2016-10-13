@@ -5,22 +5,37 @@ import (
 	"fmt"
 )
 
-func NewMongo(url string, dbName string) *Mongo {
+var instances map[string]*MongoDB = make(map[string]*MongoDB)
+
+func init()  {
+    db := NewMongoDB("localhost:27017", "lcache")
+    instances["entities"] = db
+}
+
+func GetInstance(name string) *MongoDB {
+	return instances[name]
+}
+
+func NewMongoDB(url string, dbName string) *MongoDB {
 	session, err := mgo.Dial(url)
 	if err != nil {
 		panic(fmt.Sprintf("Mongodb not found %s", url))
 	}
-	m := &Mongo{session: session, dbName: dbName}
+	m := &MongoDB{session: session, dbName: dbName}
 
 	return m
 }
 
-type Mongo struct {
+type MongoDB struct {
 	session *mgo.Session
 	// db mgo.Database
 	dbName  string
 }
 
-func (m *Mongo) Coll(collectionName string) *mgo.Collection {
+func (m *MongoDB) Coll(collectionName string) *mgo.Collection {
 	return m.session.DB(m.dbName).C(collectionName)
+}
+
+func DropCollection(db *MongoDB, cn string) {
+    db.Coll(cn).DropCollection()
 }
