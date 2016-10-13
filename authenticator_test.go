@@ -12,23 +12,25 @@ import (
 
 
 func TestFlow(t *testing.T) {
+    //
+    var err error
+    var c *r.Customer
 
-	at := r.AccessTo{Resource:"device", Action: "create"}
-	//cc := Auth("xoz", at)
-
-	db := s.GetInstance("entities")
+    // init useful variables
+    var id = "67158007-b5ff-495f-83bf-36867429a731"
+    var apiKeyStr = "OiBTGDVxmZnZHAITDMjqyQRJ-cElsforb"
+    var customerName = "customer_test"
+	var at = r.AccessTo{Resource:"device", Action: "create"}
+	var db = s.GetInstance("entities")
 
 	cRp := r.NewCustomerRP()
 	akRp := r.NewApiKeyRP()
 
-    //
+    // clean
     s.DropCollection(db, cRp.CollectionName())
     s.DropCollection(db, akRp.CollectionName())
 
-    //
-	var err error
-	var c *r.Customer
-
+    // helper function, error should be nil if not print it
 	enil := func(value interface{}) {
         a.True(t, value == nil)
         if (value != nil) { fmt.Println(value) }
@@ -38,32 +40,27 @@ func TestFlow(t *testing.T) {
     enil(err)
 
 	err = akRp.Install(db)
-	if (err != nil) { fmt.Println(err) }
+    enil(err)
 
-	// delete if there is some old ones
-	id := "67158007-b5ff-495f-83bf-36867429a731"
-	apiKeyStr := "OiBTGDVxmZnZHAITDMjqyQRJ-cElsforb"
-
-	// find non existing
+	// find non existing customer
 	c, err = cRp.FindOne(db, id)
 	a.True(t, err == mgo.ErrNotFound)
-	//enil(c)
 
-	// save
+	// save customer
 	model := &r.Customer{}
 	model.Id = id
-	model.Name = "marek"
+	model.Name = customerName
 	err = cRp.Create(db, model)
     enil(err)
 
-	// repeat
+	// repeat with new id
 	model.Id = lc.NewId()
 	err = cRp.Create(db, model)
 	a.True(t, err != nil)
 
-	// find
+	// find by first id
 	c, err = cRp.FindOne(db, id)
-	a.True(t, c.Name == "marek")
+	a.True(t, c.Name == customerName)
 	a.True(t, err == nil)
 
 	// create api key
@@ -80,7 +77,7 @@ func TestFlow(t *testing.T) {
 
     // delete api key
     err = akRp.Delete(db, ak.Id)
-    a.True(t, err == nil)
+    enil(err)
 
     // delete customer
     err = cRp.Delete(db, id)
