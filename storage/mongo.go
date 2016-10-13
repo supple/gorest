@@ -12,6 +12,10 @@ func init()  {
     instances["entities"] = db
 }
 
+func SetInstance(name string, db *MongoDB) {
+    instances[name] = db
+}
+
 func GetInstance(name string) *MongoDB {
 	return instances[name]
 }

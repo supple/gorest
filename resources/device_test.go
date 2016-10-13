@@ -10,7 +10,7 @@ import (
 func CreateCustomer(db *s.MongoDB, name string) (*Customer, error) {
     cRp := NewCustomerRP()
     c := &Customer{}
-    c.Name = "marek"
+    c.Name = name
     err := cRp.Create(db, c)
 
     return c, err
@@ -54,34 +54,30 @@ func TestDeviceRP_Update(t *testing.T) {
 
 func TestDeviceRP_Create(t *testing.T) {
     var err error
+    var cn = "customer_test"
 
     db := s.GetInstance("entities")
     dRp := NewDeviceRP()
 
-    // prepare
+    // prepare, drop device collection
     s.DropCollection(db, dRp.CollectionName())
 
-    cn := "marek"
-
+    // create Device on non existing constrains
     d := &Device{}
     d.AppId = "xo"
     d.CustomerName = cn
     err = dRp.Create(db, d)
-
     a.True(t, err.Error() == (&ErrObjectNotFound{"Customer", d.CustomerName}).Error())
 
-    // create customer
+    // create customer and device with non existing app
     c, err := CreateCustomer(db, cn)
     err = dRp.Create(db, d)
-    fmt.Println(err.Error())
     a.True(t, err.Error() == (&ErrObjectNotFound{"App", d.AppId}).Error())
 
-    // create app
+    // create app and device
     app, err := CreateApp(db, c, "android")
-    fmt.Println(app.Id)
     d.AppId = app.Id
     err = dRp.Create(db, d)
-    //fmt.Println(err.Error())
     a.True(t, err == nil)
 }
 

@@ -18,7 +18,6 @@ func TestFlow(t *testing.T) {
 
 	db := s.GetInstance("entities")
 
-
 	cRp := r.NewCustomerRP()
 	akRp := r.NewApiKeyRP()
 
