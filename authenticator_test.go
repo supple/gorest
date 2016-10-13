@@ -67,20 +67,20 @@ func TestFlow(t *testing.T) {
 	a.True(t, err == nil)
 
 	// create api key
-	ak := &r.ApiKey{CustomerName: model.Name, Key: apiKeyStr}
-	err = akRp.Create(db, ak)
+	ak := &r.ApiKey{Key: apiKeyStr}
+    ak.CustomerName = model.Name
+    err = akRp.Create(db, ak)
 	if (err != nil) { fmt.Println(err) }
 	a.True(t, err == nil)
 
-	fmt.Println("ApiKey: " + ak.Key)
-
+    // authenticate
 	cc, err := Auth(db, apiKeyStr, at)
     if (err != nil) { fmt.Println(err) }
 	a.True(t, cc != nil)
 
-
-	fmt.Println("ApiKey Id: " + ak.Id)
-    akRp.Delete(db, ak.Id)
+    // delete api key
+    err = akRp.Delete(db, ak.Id)
+    a.True(t, err == nil)
 
     // delete customer
     err = cRp.Delete(db, id)

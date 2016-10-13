@@ -30,17 +30,12 @@ type CustomerBased struct {
     CustomerName string `json:"customerName" bson:"customerName" validate:"required"`
 }
 
-func CustomerValidator() {
-
-}
-
 type Repository interface {
 	Create(db *s.MongoDB, model interface{}) (error)
 	Update(db *s.MongoDB, id string, model interface{})
 	FindOne(id string) (interface{}, error)
 	CollectionName() string
 }
-
 
 type AccessTo struct {
     Resource string

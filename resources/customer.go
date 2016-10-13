@@ -8,6 +8,7 @@ import (
 )
 
 type Customer struct {
+    Base `bson:",inline"`
     Id string `json:"id" bson:"_id"`
 	Hash string `json:"hash" bson:"hash"`
 	Name string `json:"name" bson:"name"`
@@ -64,6 +65,15 @@ func (rp *CustomerRP) Delete(db *s.MongoDB, id string) (error) {
 
 func (rp CustomerRP) CollectionName() string {
 	return "Customer"
+}
+
+func CreateCustomer(db *s.MongoDB, name string) (*Customer, error) {
+    cRp := NewCustomerRP()
+    c := &Customer{}
+    c.Name = name
+    err := cRp.Create(db, c)
+
+    return c, err
 }
 
 func (rp *CustomerRP) Install(db *s.MongoDB) error {

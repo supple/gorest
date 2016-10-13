@@ -6,18 +6,17 @@ import (
 )
 
 type App struct {
+    CustomerBased `bson:",inline"`
     AppId    string        `json:"name" bson:"name" `
     GcmToken string        `json:"gcmToken" bson:"gcmToken"`
-    AppVersion string       `json:"appVersion" bson:"appVersion"`
-    Os string        `json:"os" bson:"os"`
-    CustomerBased `bson:",inline"`
+    Os       string        `json:"os" bson:"os"`
+
 }
 
 // ### -- App repository
 
 type AppRP struct {
     gt *Gateway
-
 }
 
 func NewAppRP() *AppRP {
@@ -57,4 +56,17 @@ func (rp *AppRP) Delete(db *s.MongoDB, id string) (error) {
 
 func (rp AppRP) CollectionName() string {
     return "App"
+}
+
+func CreateApp(db *s.MongoDB, c *Customer, os string, gcmToken string) (*App, error) {
+    aRp := NewAppRP()
+
+    app := &App{}
+    app.CustomerName = c.Name
+    app.GcmToken = gcmToken
+    app.Os = os
+
+    err := aRp.Create(db, app)
+
+    return app, err
 }

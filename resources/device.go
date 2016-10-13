@@ -9,7 +9,7 @@ type Device struct {
     CustomerBased `bson:",inline"`
     AppId      string        `json:"appId" bson:"appId" `
     AppToken   string        `json:"appToken" bson:"appToken"`
-    AppVersion int32         `json:"appVersion" bson:"appVersion"`
+    AppVersion string         `json:"appVersion" bson:"appVersion"`
 }
 
 // --- ## Device repository

@@ -1,6 +1,5 @@
 package resources
 
-
 import (
     "gopkg.in/mgo.v2/bson"
     s "github.com/supple/gorest/storage"

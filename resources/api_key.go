@@ -10,9 +10,8 @@ import (
 )
 
 type ApiKey struct {
-    Id           string `json:"id" bson:"_id"`
-    Key          string `json:"key" bson:"key"`
-    CustomerName string `json:"customerName" bson:"customerName" validate:"required"`
+    CustomerBased `bson:",inline"`
+    Key string `json:"key" bson:"key"`
 }
 
 // ### -- ApiKey repo
@@ -82,6 +81,14 @@ func (rp ApiKeyRP) CollectionName() string {
     return "ApiKey"
 }
 
+func CreateApiKey(db *s.MongoDB, c *Customer) (*ApiKey, error) {
+    akRp := NewApiKeyRP()
+    ak := &ApiKey{}
+    ak.CustomerName = c.Name
+    err := akRp.Create(db, ak)
+
+    return ak, err
+}
 
 func (rp *ApiKeyRP) Install(db *s.MongoDB) error {
     var index mgo.Index

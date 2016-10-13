@@ -7,49 +7,21 @@ import (
     "fmt"
 )
 
-func CreateCustomer(db *s.MongoDB, name string) (*Customer, error) {
-    cRp := NewCustomerRP()
-    c := &Customer{}
-    c.Name = name
-    err := cRp.Create(db, c)
-
-    return c, err
-}
-
-func CreateApiKey(db *s.MongoDB, c *Customer, apiKey string) (*ApiKey, error) {
-    akRp := NewApiKeyRP()
-    ak := &ApiKey{}
-    ak.CustomerName = c.Name
-    err := akRp.Create(db, ak)
-
-    return ak, err
-}
-
-func CreateApp(db *s.MongoDB, c *Customer, os string) (*App, error) {
-    aRp := NewAppRP()
-    app := &App{}
-    app.CustomerName = c.Name
-    app.AppVersion = "1.2.0"
-    app.Os = os
-    err := aRp.Create(db, app)
-
-    return app, err
-}
-
 func TestDeviceRP_Update(t *testing.T) {
     d := Device{}
 
     m := make(map[string]interface{})
-    m["appToken"] = "xo"
-    m["appVersion"] = "1.2"
-    m["customerName"] = "xod"
-    m["appId"] = "xos"
+    m["appToken"] = "a"
+    m["appVersion"] = "b"
+    m["customerName"] = "c"
+    m["appId"] = "d"
 
     UpdateModel(&d, m)
     fmt.Println(d.AppId)
-    if (d.AppId != "xos") { t.Fatalf("Fail appId: %s", d.AppId) }
-    if (d.CustomerName != "xod") { t.Fatalf("Fail customerName: %s", d.CustomerName) }
-    if (d.AppToken != "xo") { t.Fatalf("Fail appToken: %s", d.AppToken) }
+    if (d.AppToken != "a") { t.Fatalf("Fail appToken: %s", d.AppToken) }
+    if (d.AppVersion != "b") { t.Fatalf("Fail appVersion: %s", d.AppVersion) }
+    if (d.CustomerName != "c") { t.Fatalf("Fail customerName: %s", d.CustomerName) }
+    if (d.AppId != "d") { t.Fatalf("Fail appId: %s", d.AppId) }
 }
 
 func TestDeviceRP_Create(t *testing.T) {
@@ -75,7 +47,7 @@ func TestDeviceRP_Create(t *testing.T) {
     a.True(t, err.Error() == (&ErrObjectNotFound{"App", d.AppId}).Error())
 
     // create app and device
-    app, err := CreateApp(db, c, "android")
+    app, err := CreateApp(db, c, "android", "_")
     d.AppId = app.Id
     err = dRp.Create(db, d)
     a.True(t, err == nil)
