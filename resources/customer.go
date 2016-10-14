@@ -1,11 +1,14 @@
 package resources
 
+
 import (
-	"gopkg.in/mgo.v2"
-	"gopkg.in/mgo.v2/bson"
-	s "github.com/supple/gorest/storage"
-	lc "github.com/supple/gorest/utils"
+    "gopkg.in/mgo.v2"
+    "gopkg.in/mgo.v2/bson"
+    "github.com/supple/gorest/core"
+    s "github.com/supple/gorest/storage"
+    lc "github.com/supple/gorest/utils"
 )
+
 
 type Customer struct {
     CustomerBased `bson:",inline"`
@@ -17,10 +20,10 @@ const CUSTOMER_NAME_FIELD string = "customerName"
 
 type CustomerRP struct{
     gt *Gateway
-    cc *CustomerContext
+    cc *core.CustomerContext
 }
 
-func NewCustomerRP(cc *CustomerContext) *CustomerRP {
+func NewCustomerRP(cc *core.CustomerContext) *CustomerRP {
     rp := &CustomerRP{cc:cc}
     gt := NewGateway(rp.CollectionName(), cc)
     rp.gt = gt
@@ -68,7 +71,7 @@ func (rp CustomerRP) CollectionName() string {
 }
 
 func CreateCustomer(db *s.MongoDB, name string) (*Customer, error) {
-    cc := &CustomerContext{CustomerName:name}
+    cc := &core.CustomerContext{CustomerName: name}
     cRp := NewCustomerRP(cc)
     c := &Customer{}
     c.CustomerName = name

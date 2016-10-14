@@ -2,10 +2,10 @@ package main
 
 import (
 	"gopkg.in/mgo.v2/bson"
+	"github.com/supple/gorest/core"
 	s "github.com/supple/gorest/storage"
 	r "github.com/supple/gorest/resources"
 )
-
 
 type App struct {
 	Id     string `json:"id" bson:"_id"`
@@ -38,13 +38,13 @@ type App struct {
 //}
 
 
-func Auth(db *s.MongoDB, apiKey string, accessTo r.AccessTo) (*r.CustomerContext, error) {
-	var cc *r.CustomerContext
+func Auth(db *s.MongoDB, apiKey string, accessTo r.AccessTo) (*core.CustomerContext, error) {
+	var cc *core.CustomerContext
 	akRp := r.NewApiKeyRP(cc)
 	ak, err := akRp.FindOneBy(db, bson.M{"key": apiKey})
 	// @todo: hasAccess(accessTo)
 	if err == nil {
-		cc = &r.CustomerContext{}
+		cc = &core.CustomerContext{}
 		cc.ApiKey = ak.Key
 		cc.CustomerName = ak.CustomerName
 	}

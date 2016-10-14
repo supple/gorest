@@ -2,6 +2,7 @@ package resources
 
 import (
     "testing"
+    "github.com/supple/gorest/core"
     s "github.com/supple/gorest/storage"
     a "github.com/stretchr/testify/assert"
     "fmt"
@@ -27,7 +28,7 @@ func TestDeviceRP_Update(t *testing.T) {
 func TestDeviceRP_Create(t *testing.T) {
     var err error
     var cn = "customer_test"
-    cc := &CustomerContext{CustomerName:cn}
+    cc := &core.CustomerContext{CustomerName:cn}
 
     db := s.GetInstance("entities")
     dRp := NewDeviceRP(cc)

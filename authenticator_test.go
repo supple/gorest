@@ -2,6 +2,7 @@ package main
 
 import (
     "testing"
+    "github.com/supple/gorest/core"
     a "github.com/stretchr/testify/assert"
     s "github.com/supple/gorest/storage"
     r "github.com/supple/gorest/resources"
@@ -22,7 +23,7 @@ func TestFlow(t *testing.T) {
     var at = r.AccessTo{Resource:"device", Action: "create"}
     var db = s.GetInstance("entities")
 
-    var cc *r.CustomerContext = &r.CustomerContext{CustomerName: customerName}
+    var cc *core.CustomerContext = &core.CustomerContext{CustomerName: customerName}
 
     cRp := r.NewCustomerRP(cc)
     akRp := r.NewApiKeyRP(cc)

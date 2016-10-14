@@ -3,6 +3,7 @@ package resources
 import (
     "gopkg.in/mgo.v2/bson"
     s "github.com/supple/gorest/storage"
+    "github.com/supple/gorest/core"
 )
 
 type App struct {
@@ -17,10 +18,10 @@ type App struct {
 
 type AppRP struct {
     gt *Gateway
-    cc *CustomerContext
+    cc *core.CustomerContext
 }
 
-func NewAppRP(cc *CustomerContext) *AppRP {
+func NewAppRP(cc *core.CustomerContext) *AppRP {
     rp := &AppRP{cc:cc}
     gt := NewGateway(rp.CollectionName(), cc)
     rp.gt = gt
@@ -60,7 +61,7 @@ func (rp AppRP) CollectionName() string {
     return "App"
 }
 
-func CreateApp(db *s.MongoDB, cc *CustomerContext, os string, gcmToken string) (*App, error) {
+func CreateApp(db *s.MongoDB, cc *core.CustomerContext, os string, gcmToken string) (*App, error) {
     aRp := NewAppRP(cc)
 
     app := &App{}

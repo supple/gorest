@@ -3,6 +3,7 @@ package resources
 import (
     "gopkg.in/mgo.v2"
     "gopkg.in/mgo.v2/bson"
+    "github.com/supple/gorest/core"
     s "github.com/supple/gorest/storage"
     lc "github.com/supple/gorest/utils"
     "fmt"
@@ -17,10 +18,10 @@ type ApiKey struct {
 
 type ApiKeyRP struct {
     gt *Gateway
-    cc *CustomerContext
+    cc *core.CustomerContext
 }
 
-func NewApiKeyRP(cc *CustomerContext) *ApiKeyRP {
+func NewApiKeyRP(cc *core.CustomerContext) *ApiKeyRP {
     rp := &ApiKeyRP{cc:cc}
     gt := NewGateway(rp.CollectionName(), cc)
     rp.gt = gt
@@ -55,7 +56,7 @@ func (rp *ApiKeyRP) FindOne(db *s.MongoDB, id string) (*ApiKey, error) {
 
 func (rp *ApiKeyRP) FindOneBy(db *s.MongoDB, conditions bson.M) (*ApiKey, error) {
     result := &ApiKey{}
-    err := rp.gt.FindOneBy(db, conditions, result)
+    err := rp.gt.FindInsecureOneBy(db, conditions, result)
     return result, err
 }
 
@@ -78,7 +79,7 @@ func (rp ApiKeyRP) CollectionName() string {
     return "ApiKey"
 }
 
-func CreateApiKey(db *s.MongoDB, cc *CustomerContext) (*ApiKey, error) {
+func CreateApiKey(db *s.MongoDB, cc *core.CustomerContext) (*ApiKey, error) {
     akRp := NewApiKeyRP(cc)
     ak := &ApiKey{}
     ak.CustomerName = cc.CustomerName

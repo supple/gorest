@@ -42,11 +42,6 @@ type AccessTo struct {
     Action string
 }
 
-type CustomerContext struct {
-    ApiKey string
-    CustomerName string
-}
-
 func ucfirst(s string) string {
     r, size := utf8.DecodeRuneInString(s)
     buf := &bytes.Buffer{}

@@ -2,6 +2,7 @@ package resources
 
 import (
     "gopkg.in/mgo.v2/bson"
+    "github.com/supple/gorest/core"
     s "github.com/supple/gorest/storage"
     lc "github.com/supple/gorest/utils"
     "reflect"
@@ -9,10 +10,10 @@ import (
 
 type Gateway struct {
     collectionName string
-    cc *CustomerContext
+    cc *core.CustomerContext
 }
 
-func NewGateway(collectionName string, cc *CustomerContext) *Gateway {
+func NewGateway(collectionName string, cc *core.CustomerContext) *Gateway {
     return &Gateway{collectionName: collectionName, cc: cc}
 }
 
@@ -41,7 +42,13 @@ func (gt *Gateway) FindById(db *s.MongoDB, id string, result interface{}) error 
 }
 
 func (gt *Gateway) FindOneBy(db *s.MongoDB, conditions bson.M, result interface{}) error {
-    //conditions["customerName"] = gt.cc.CustomerName
+    conditions["customerName"] = gt.cc.CustomerName
+    err := db.Coll(gt.collectionName).Find(conditions).One(result)
+    return err
+}
+
+// Find element without customer context
+func (gt *Gateway) FindInsecureOneBy(db *s.MongoDB, conditions bson.M, result interface{}) error {
     err := db.Coll(gt.collectionName).Find(conditions).One(result)
     return err
 }

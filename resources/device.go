@@ -2,6 +2,7 @@ package resources
 
 import (
     "gopkg.in/mgo.v2/bson"
+    "github.com/supple/gorest/core"
     s "github.com/supple/gorest/storage"
 )
 
@@ -16,10 +17,10 @@ type Device struct {
 
 type DeviceRP struct {
     gt *Gateway
-    cc *CustomerContext
+    cc *core.CustomerContext
 }
 
-func NewDeviceRP(cc *CustomerContext) *DeviceRP {
+func NewDeviceRP(cc *core.CustomerContext) *DeviceRP {
     rp := &DeviceRP{cc: cc}
     gt := NewGateway(rp.CollectionName(), cc)
     rp.gt = gt
