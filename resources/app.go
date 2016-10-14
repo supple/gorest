@@ -17,13 +17,13 @@ type App struct {
 // ### -- App repository
 
 type AppRP struct {
-    gt *Gateway
+    gt *core.Gateway
     cc *core.CustomerContext
 }
 
 func NewAppRP(cc *core.CustomerContext) *AppRP {
     rp := &AppRP{cc:cc}
-    gt := NewGateway(rp.CollectionName(), cc)
+    gt := core.NewGateway(rp.CollectionName(), cc)
     rp.gt = gt
 
     return rp

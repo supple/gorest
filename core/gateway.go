@@ -1,8 +1,7 @@
-package resources
+package core
 
 import (
     "gopkg.in/mgo.v2/bson"
-    "github.com/supple/gorest/core"
     s "github.com/supple/gorest/storage"
     lc "github.com/supple/gorest/utils"
     "reflect"
@@ -10,10 +9,10 @@ import (
 
 type Gateway struct {
     collectionName string
-    cc *core.CustomerContext
+    cc *CustomerContext
 }
 
-func NewGateway(collectionName string, cc *core.CustomerContext) *Gateway {
+func NewGateway(collectionName string, cc *CustomerContext) *Gateway {
     return &Gateway{collectionName: collectionName, cc: cc}
 }
 

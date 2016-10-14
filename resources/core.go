@@ -22,10 +22,9 @@ func (e *ErrObjectNotFound) Error() string {
     return fmt.Sprintf("Object not found: %s, value: %s", e.object, e.value)
 }
 
-type Base struct {}
+const CUSTOMER_NAME_FIELD string = "customerName"
 
 type CustomerBased struct {
-    Base        `bson:",inline"`
     Id           string `json:"id" bson:"_id"`
     CustomerName string `json:"customerName" bson:"customerName" validate:"required"`
 }
@@ -71,6 +70,5 @@ func UpdateModel(c interface{}, data map[string]interface{}) {
         } else {
             vDst.Set(vSrc)
         }
-
     }
 }

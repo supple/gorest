@@ -16,16 +16,15 @@ type Customer struct {
 }
 
 // ### -- Customer repo
-const CUSTOMER_NAME_FIELD string = "customerName"
 
 type CustomerRP struct{
-    gt *Gateway
+    gt *core.Gateway
     cc *core.CustomerContext
 }
 
 func NewCustomerRP(cc *core.CustomerContext) *CustomerRP {
     rp := &CustomerRP{cc:cc}
-    gt := NewGateway(rp.CollectionName(), cc)
+    gt := core.NewGateway(rp.CollectionName(), cc)
     rp.gt = gt
 
     return rp

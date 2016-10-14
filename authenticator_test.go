@@ -68,7 +68,7 @@ func TestFlow(t *testing.T) {
     a.True(t, err == nil)
 
     // create api key
-    ak := &r.ApiKey{Key: apiKeyStr}
+    ak := &r.ApiKey{ApiKey: apiKeyStr}
     ak.CustomerName = model.CustomerName
     err = akRp.Create(db, ak)
     if (err != nil) {

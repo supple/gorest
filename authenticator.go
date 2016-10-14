@@ -41,12 +41,14 @@ type App struct {
 func Auth(db *s.MongoDB, apiKey string, accessTo r.AccessTo) (*core.CustomerContext, error) {
 	var cc *core.CustomerContext
 	akRp := r.NewApiKeyRP(cc)
-	ak, err := akRp.FindOneBy(db, bson.M{"key": apiKey})
+	ak, err := akRp.FindOneBy(db, bson.M{r.API_KEY_FIELD: apiKey})
 	// @todo: hasAccess(accessTo)
 	if err == nil {
 		cc = &core.CustomerContext{}
-		cc.ApiKey = ak.Key
+        // copy ot customer context
+		cc.ApiKey = ak.ApiKey
 		cc.CustomerName = ak.CustomerName
+        cc.AppId = ak.AppId
 	}
 
 	return cc, err

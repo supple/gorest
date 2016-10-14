@@ -9,21 +9,24 @@ import (
     "fmt"
 )
 
+const API_KEY_FIELD string = "apiKey"
+
 type ApiKey struct {
     CustomerBased `bson:",inline"`
-    Key string `json:"key" bson:"key"`
+    AppId  string `json:"appId" bson:"appId"`
+    ApiKey string `json:"apiKey" bson:"apiKey"`
 }
 
 // ### -- ApiKey repo
 
 type ApiKeyRP struct {
-    gt *Gateway
+    gt *core.Gateway
     cc *core.CustomerContext
 }
 
 func NewApiKeyRP(cc *core.CustomerContext) *ApiKeyRP {
     rp := &ApiKeyRP{cc:cc}
-    gt := NewGateway(rp.CollectionName(), cc)
+    gt := core.NewGateway(rp.CollectionName(), cc)
     rp.gt = gt
 
     return rp
@@ -36,15 +39,15 @@ func (rp *ApiKeyRP) Create(db *s.MongoDB, model *ApiKey) error {
      // validate
     customer, err := rp.ConstraintsValidation(db, model)
     if (err != nil) {
-        return err
+        return &ErrObjectNotFound{"Customer", rp.cc.CustomerName}
     }
-
+    fmt.Println("OK CUST is")
     // create key if not set
-    if (len(model.Key) == 0) {
-        model.Key = fmt.Sprintf("%s-%s", lc.RandString(24), customer.Hash)
+    if (len(model.ApiKey) == 0) {
+        model.ApiKey = fmt.Sprintf("%s-%s", lc.RandString(24), customer.Hash)
     }
     err = rp.gt.Insert(db, model)
-
+    fmt.Println(model)
     return err
 }
 

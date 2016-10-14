@@ -16,13 +16,13 @@ type Device struct {
 // --- ## Device repository
 
 type DeviceRP struct {
-    gt *Gateway
+    gt *core.Gateway
     cc *core.CustomerContext
 }
 
 func NewDeviceRP(cc *core.CustomerContext) *DeviceRP {
     rp := &DeviceRP{cc: cc}
-    gt := NewGateway(rp.CollectionName(), cc)
+    gt := core.NewGateway(rp.CollectionName(), cc)
     rp.gt = gt
 
     return rp
