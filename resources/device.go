@@ -16,11 +16,12 @@ type Device struct {
 
 type DeviceRP struct {
     gt *Gateway
+    cc *CustomerContext
 }
 
-func NewDeviceRP() *DeviceRP {
-    rp := &DeviceRP{}
-    gt := &Gateway{collectionName: rp.CollectionName()}
+func NewDeviceRP(cc *CustomerContext) *DeviceRP {
+    rp := &DeviceRP{cc: cc}
+    gt := NewGateway(rp.CollectionName(), cc)
     rp.gt = gt
 
     return rp
@@ -61,13 +62,13 @@ func (rp *DeviceRP) Delete(db *s.MongoDB, id string) (error) {
 
 func (rp *DeviceRP) ConstraintsValidation(db *s.MongoDB, model *Device) (error) {
     var err error
-    csRp := NewCustomerRP()
+    csRp := NewCustomerRP(rp.cc)
     _, err = csRp.FindOneByName(db, model.CustomerName)
     if (err != nil) {
         return &ErrObjectNotFound{"Customer", model.CustomerName}
     }
 
-    appRp := NewAppRP()
+    appRp := NewAppRP(rp.cc)
     _, err = appRp.FindOne(db, model.AppId)
     if (err != nil) {
         return &ErrObjectNotFound{"App", model.AppId}

@@ -17,17 +17,19 @@ type App struct {
 
 type AppRP struct {
     gt *Gateway
+    cc *CustomerContext
 }
 
-func NewAppRP() *AppRP {
-    rp := &AppRP{}
-    gt := &Gateway{collectionName: rp.CollectionName()}
+func NewAppRP(cc *CustomerContext) *AppRP {
+    rp := &AppRP{cc:cc}
+    gt := NewGateway(rp.CollectionName(), cc)
     rp.gt = gt
 
     return rp
 }
 
 func (rp *AppRP) Create(db *s.MongoDB, model *App) error {
+    model.CustomerName = rp.cc.CustomerName
     return rp.gt.Insert(db, model)
 }
 
@@ -58,11 +60,10 @@ func (rp AppRP) CollectionName() string {
     return "App"
 }
 
-func CreateApp(db *s.MongoDB, c *Customer, os string, gcmToken string) (*App, error) {
-    aRp := NewAppRP()
+func CreateApp(db *s.MongoDB, cc *CustomerContext, os string, gcmToken string) (*App, error) {
+    aRp := NewAppRP(cc)
 
     app := &App{}
-    app.CustomerName = c.Name
     app.GcmToken = gcmToken
     app.Os = os
 

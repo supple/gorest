@@ -8,21 +8,21 @@ import (
 )
 
 type Customer struct {
-    Base `bson:",inline"`
-    Id string `json:"id" bson:"_id"`
+    CustomerBased `bson:",inline"`
 	Hash string `json:"hash" bson:"hash"`
-	Name string `json:"name" bson:"name"`
 }
 
 // ### -- Customer repo
+const CUSTOMER_NAME_FIELD string = "customerName"
 
 type CustomerRP struct{
     gt *Gateway
+    cc *CustomerContext
 }
 
-func NewCustomerRP() *CustomerRP {
-    rp := &CustomerRP{}
-    gt := &Gateway{collectionName: rp.CollectionName()}
+func NewCustomerRP(cc *CustomerContext) *CustomerRP {
+    rp := &CustomerRP{cc:cc}
+    gt := NewGateway(rp.CollectionName(), cc)
     rp.gt = gt
 
     return rp
@@ -47,7 +47,7 @@ func (rp *CustomerRP) FindOne(db *s.MongoDB, id string) (*Customer, error) {
 
 func (rp *CustomerRP) FindOneByName(db *s.MongoDB, customerName string) (*Customer, error) {
 	result := &Customer{}
-    conditions := bson.M{"name": customerName}
+    conditions := bson.M{CUSTOMER_NAME_FIELD: customerName}
 	err := rp.gt.FindOneBy(db, conditions, result)
 	return result, err
 }
@@ -68,9 +68,10 @@ func (rp CustomerRP) CollectionName() string {
 }
 
 func CreateCustomer(db *s.MongoDB, name string) (*Customer, error) {
-    cRp := NewCustomerRP()
+    cc := &CustomerContext{CustomerName:name}
+    cRp := NewCustomerRP(cc)
     c := &Customer{}
-    c.Name = name
+    c.CustomerName = name
     err := cRp.Create(db, c)
 
     return c, err
@@ -78,7 +79,7 @@ func CreateCustomer(db *s.MongoDB, name string) (*Customer, error) {
 
 func (rp *CustomerRP) Install(db *s.MongoDB) error {
 	index := mgo.Index{
-		Key: []string{"name"},
+		Key: []string{CUSTOMER_NAME_FIELD},
 		Unique: true,
 		DropDups: false,
 		Background: true, // See notes.

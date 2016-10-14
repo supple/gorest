@@ -6,7 +6,6 @@ import (
     s "github.com/supple/gorest/storage"
     lc "github.com/supple/gorest/utils"
     "fmt"
-    "errors"
 )
 
 type ApiKey struct {
@@ -18,11 +17,12 @@ type ApiKey struct {
 
 type ApiKeyRP struct {
     gt *Gateway
+    cc *CustomerContext
 }
 
-func NewApiKeyRP() *ApiKeyRP {
-    rp := &ApiKeyRP{}
-    gt := &Gateway{collectionName: rp.CollectionName()}
+func NewApiKeyRP(cc *CustomerContext) *ApiKeyRP {
+    rp := &ApiKeyRP{cc:cc}
+    gt := NewGateway(rp.CollectionName(), cc)
     rp.gt = gt
 
     return rp
@@ -30,11 +30,9 @@ func NewApiKeyRP() *ApiKeyRP {
 
 func (rp *ApiKeyRP) Create(db *s.MongoDB, model *ApiKey) error {
     var err error
+    model.CustomerName = rp.cc.CustomerName
 
      // validate
-    if (len(model.CustomerName) == 0) {
-        return errors.New("Customer name not set")
-    }
     customer, err := rp.ConstraintsValidation(db, model)
     if (err != nil) {
         return err
@@ -44,7 +42,6 @@ func (rp *ApiKeyRP) Create(db *s.MongoDB, model *ApiKey) error {
     if (len(model.Key) == 0) {
         model.Key = fmt.Sprintf("%s-%s", lc.RandString(24), customer.Hash)
     }
-
     err = rp.gt.Insert(db, model)
 
     return err
@@ -68,7 +65,7 @@ func (rp *ApiKeyRP) Delete(db *s.MongoDB, id string) (error) {
 }
 
 func (rp *ApiKeyRP) ConstraintsValidation(db *s.MongoDB, model *ApiKey) (*Customer, error) {
-    csRp := NewCustomerRP()
+    csRp := NewCustomerRP(rp.cc)
     c, err := csRp.FindOneByName(db, model.CustomerName)
     if (c == nil) {
         return nil, ErrNotFound
@@ -81,10 +78,10 @@ func (rp ApiKeyRP) CollectionName() string {
     return "ApiKey"
 }
 
-func CreateApiKey(db *s.MongoDB, c *Customer) (*ApiKey, error) {
-    akRp := NewApiKeyRP()
+func CreateApiKey(db *s.MongoDB, cc *CustomerContext) (*ApiKey, error) {
+    akRp := NewApiKeyRP(cc)
     ak := &ApiKey{}
-    ak.CustomerName = c.Name
+    ak.CustomerName = cc.CustomerName
     err := akRp.Create(db, ak)
 
     return ak, err

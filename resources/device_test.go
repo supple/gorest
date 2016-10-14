@@ -27,9 +27,10 @@ func TestDeviceRP_Update(t *testing.T) {
 func TestDeviceRP_Create(t *testing.T) {
     var err error
     var cn = "customer_test"
+    cc := &CustomerContext{CustomerName:cn}
 
     db := s.GetInstance("entities")
-    dRp := NewDeviceRP()
+    dRp := NewDeviceRP(cc)
 
     // prepare, drop device collection
     s.DropCollection(db, dRp.CollectionName())
@@ -42,12 +43,12 @@ func TestDeviceRP_Create(t *testing.T) {
     a.True(t, err.Error() == (&ErrObjectNotFound{"Customer", d.CustomerName}).Error())
 
     // create customer and device with non existing app
-    c, err := CreateCustomer(db, cn)
+    _, err = CreateCustomer(db, cn)
     err = dRp.Create(db, d)
     a.True(t, err.Error() == (&ErrObjectNotFound{"App", d.AppId}).Error())
 
     // create app and device
-    app, err := CreateApp(db, c, "android", "_")
+    app, err := CreateApp(db, cc, "android", "_")
     d.AppId = app.Id
     err = dRp.Create(db, d)
     a.True(t, err == nil)
