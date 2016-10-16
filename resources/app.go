@@ -11,7 +11,6 @@ type App struct {
     AppId    string        `json:"name" bson:"name" `
     GcmToken string        `json:"gcmToken" bson:"gcmToken"`
     Os       string        `json:"os" bson:"os"`
-
 }
 
 // ### -- App repository
@@ -25,7 +24,6 @@ func NewAppRP(cc *core.CustomerContext) *AppRP {
     rp := &AppRP{cc:cc}
     gt := core.NewGateway(rp.CollectionName(), cc)
     rp.gt = gt
-
     return rp
 }
 
@@ -42,7 +40,6 @@ func (rp *AppRP) Update(db *s.MongoDB, id string, model *map[string]interface{})
 func (rp *AppRP) FindOne(db *s.MongoDB, id string) (*App, error) {
     result := &App{}
     err := rp.gt.FindById(db, id, result)
-
     return result, err
 }
 
@@ -69,6 +66,5 @@ func CreateApp(db *s.MongoDB, cc *core.CustomerContext, os string, gcmToken stri
     app.Os = os
 
     err := aRp.Create(db, app)
-
     return app, err
 }

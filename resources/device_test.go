@@ -54,5 +54,3 @@ func TestDeviceRP_Create(t *testing.T) {
     err = dRp.Create(db, d)
     a.True(t, err == nil)
 }
-
-

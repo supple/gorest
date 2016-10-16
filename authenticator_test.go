@@ -2,8 +2,8 @@ package main
 
 import (
     "testing"
-    "github.com/supple/gorest/core"
     a "github.com/stretchr/testify/assert"
+    "github.com/supple/gorest/core"
     s "github.com/supple/gorest/storage"
     r "github.com/supple/gorest/resources"
     lc "github.com/supple/gorest/utils"

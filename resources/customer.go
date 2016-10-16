@@ -1,6 +1,5 @@
 package resources
 
-
 import (
     "gopkg.in/mgo.v2"
     "gopkg.in/mgo.v2/bson"
@@ -8,7 +7,6 @@ import (
     s "github.com/supple/gorest/storage"
     lc "github.com/supple/gorest/utils"
 )
-
 
 type Customer struct {
     CustomerBased `bson:",inline"`
@@ -43,7 +41,6 @@ func (rp *CustomerRP) Update(db *s.MongoDB, id string, model *map[string]interfa
 func (rp *CustomerRP) FindOne(db *s.MongoDB, id string) (*Customer, error) {
 	result := &Customer{}
     err := rp.gt.FindById(db, id, result)
-
 	return result, err
 }
 
@@ -75,7 +72,6 @@ func CreateCustomer(db *s.MongoDB, name string) (*Customer, error) {
     c := &Customer{}
     c.CustomerName = name
     err := cRp.Create(db, c)
-
     return c, err
 }
 
