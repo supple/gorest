@@ -1,13 +1,6 @@
-package main
+package storage
 
-
-type Storage interface {
-    Set(id string, obj interface{}) bool
-    Get(id string) (interface{}, error)
-    Has(id string) bool
-    Del(id string) bool
-}
-
+import "sync"
 
 type Item struct {
     value interface{}
@@ -20,6 +13,7 @@ func (it *Item) NewItem(v interface{})  {
 // Cache, id -> *Object
 type MemStorage struct {
     objects map[string]interface{}
+    mu *sync.RWMutex
 }
 
 func NewMemStorage() *MemStorage {
@@ -35,35 +29,35 @@ func NewMemStorage() *MemStorage {
 
 // Get returns object, or nil if there's no one.
 func (ca* MemStorage) Get(id string) interface{} {
-    mu.RLock()
+    ca.mu.RLock()
     obj := ca.objects[id]
-    mu.RUnlock()
+    ca.mu.RUnlock()
 
     return obj
 }
 
 // Set object in storage
 func (ca* MemStorage) Set(id string, obj interface{}) bool {
-    mu.Lock()
+    ca.mu.Lock()
     ca.objects[id] = obj
-    mu.Unlock()
+    ca.mu.Unlock()
     return true
 }
 
 // Update object in storage
 func (ca* MemStorage) Update(id string,obj interface{}) {
-    mu.Lock()
+    ca.mu.Lock()
     ca.objects[id] = obj
-    mu.Unlock()
+    ca.mu.Unlock()
 }
 
 // Get object names with ids
 func (ca* MemStorage) GetByCriteria() []interface{} {
     var names []interface{}
-    mu.RLock()
+    ca.mu.RLock()
     for _, obj := range ca.objects {
         names = append(names, obj)
     }
-    mu.RUnlock()
+    ca.mu.RUnlock()
     return names
 }

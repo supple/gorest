@@ -4,22 +4,19 @@ import (
     "fmt"
     "net/http"
     "encoding/json"
-    "github.com/zenazn/goji"
-    "github.com/zenazn/goji/web"
-    "github.com/zenazn/goji/web/middleware"
-    "log"
-    "github.com/supple/gorest/resources"
+    _ "log"
+
+    "github.com/gin-gonic/gin"
+    "github.com/supple/gorest/core"
+    "github.com/supple/gorest/storage"
     "os"
     "os/signal"
     "syscall"
+    "github.com/supple/gorest/events"
+    "github.com/supple/gorest/worker"
 )
 
-
-type AppService struct {
-    Storage *MemStorage
-}
-
-var app = AppService{}
+var app = core.AppServices{}
 
 func jsonResponse(w http.ResponseWriter, data interface{}) {
     w.Header().Set("Content-Type", "application/json")
@@ -29,8 +26,8 @@ func jsonResponse(w http.ResponseWriter, data interface{}) {
     encoder.Encode(data)
 }
 
-func InitCache(app *AppService) {
-    app.Storage = NewMemStorage()
+func InitCache(app *core.AppServices) {
+    app.Storage = storage.NewMemStorage()
 }
 //
 //func CampaignGet(c web.C, w http.ResponseWriter, r *http.Request) {
@@ -80,17 +77,30 @@ func signalCatcher() chan os.Signal {
     return c
 }
 
+func init() {
+
+    // Create the job queue.
+    maxQueueSize := 50
+    maxWorkers := 5
+
+    events.EventJobQueue = make(chan worker.Job, maxQueueSize)
+
+    // Start the dispatcher.
+    d := worker.NewDispatcher(events.EventJobQueue, maxWorkers)
+    d.Run(&app)
+
+    // dispatch worker producers
+    go d.Dispatch()
+}
+
 func main() {
     fmt.Println("v1.0.0")
     InitCache(&app)
+    r := gin.Default()
+    v1 := r.Group("api/v1")
+    {
+        v1.POST("/events", events.HandleEvents)
+    }
 
-    goji.DefaultMux.Abandon(middleware.Logger)
-
-    //goji.Get("/v1/devices/", CampaignList)
-    //goji.Get("/v1/devices/:id", CampaignGet)
-    //goji.Post("/v1/devices/", CampaignAdd)
-	//goji.Patch("/v1/devices/:id", CampaignUpdate)
-
-    goji.Serve()
+    r.Run(":8080")
 }
-
