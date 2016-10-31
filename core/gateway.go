@@ -5,15 +5,21 @@ import (
     s "github.com/supple/gorest/storage"
     lc "github.com/supple/gorest/utils"
     "reflect"
+    "gopkg.in/mgo.v2"
 )
 
 type Gateway struct {
     collectionName string
     cc *CustomerContext
+    coll *mgo.Collection
 }
 
 func NewGateway(collectionName string, cc *CustomerContext) *Gateway {
     return &Gateway{collectionName: collectionName, cc: cc}
+}
+
+func (gt *Gateway) getColl() {
+
 }
 
 func (gt *Gateway) Insert(db *s.MongoDB, model interface{}) error {

@@ -39,8 +39,8 @@ type MongoDB struct {
 	dbName  string
 }
 
-func (m *MongoDB) Coll(collectionName string) *mgo.Collection {
-	return m.session.DB(m.dbName).C(collectionName)
+func (m *MongoDB) Coll(collName string) *mgo.Collection {
+	return m.session.DB(m.dbName).C(collName)
 }
 
 func DropCollection(db *MongoDB, cn string) {

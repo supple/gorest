@@ -14,6 +14,7 @@ import (
     "syscall"
     "github.com/supple/gorest/events"
     "github.com/supple/gorest/worker"
+    "github.com/gin-gonic/contrib/gzip"
 )
 
 var app = core.AppServices{}
@@ -71,14 +72,7 @@ func InitCache(app *core.AppServices) {
 //    jsonResponse(w, obj)
 //}
 
-func signalCatcher() chan os.Signal {
-    c := make(chan os.Signal, 1)
-    signal.Notify(c, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT)
-    return c
-}
-
 func init() {
-
     // Create the job queue.
     maxQueueSize := 50
     maxWorkers := 5
@@ -93,10 +87,44 @@ func init() {
     go d.Dispatch()
 }
 
+func signalCatcher() chan os.Signal {
+    c := make(chan os.Signal, 1)
+    signal.Notify(c, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT)
+    return c
+}
+
+
+func CORSMiddleware() gin.HandlerFunc {
+    return func(c *gin.Context) {
+        c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
+        c.Writer.Header().Set("Access-Control-Allow-Headers", "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization")
+        if c.Request.Method == "OPTIONS" {
+            c.Abort()
+            return
+        }
+        c.Next()
+    }
+}
+
+func errorHandler(c *gin.Context) {
+    c.Next()
+
+    if len(c.Errors)>0 {
+        c.JSON(-1, c.Errors) // -1 == not override the current error code
+    }
+}
+
 func main() {
     fmt.Println("v1.0.0")
     InitCache(&app)
-    r := gin.Default()
+
+    r := gin.New()
+    r.Use(gin.Recovery())
+    r.Use(errorHandler)
+    r.Use(gzip.Gzip(gzip.DefaultCompression))
+    //r.Use(CORSMiddleware())
+
+    //r := gin.Default()
     v1 := r.Group("api/v1")
     {
         v1.POST("/events", events.HandleEvents)

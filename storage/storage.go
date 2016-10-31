@@ -1,7 +1,5 @@
 package storage
 
-
-
 type Storage interface {
     Set(id string, obj interface{}) bool
     Get(id string) (interface{}, error)

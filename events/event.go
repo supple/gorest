@@ -8,6 +8,7 @@ import (
 )
 
 var EventJobQueue chan worker.Job
+
 type Payload map[string]interface{}
 
 type Event struct {
@@ -17,7 +18,6 @@ type Event struct {
     AppId    string `json:"appId"`
     DeviceId string `json:"deviceId"`
     Payload  Payload `json:"payload, omitempty"` //Payload json.RawMessage `json:"payload, omitempty"`
-
     Request string `json:"request"`
 }
 
@@ -36,7 +36,7 @@ func HandleEvents(c *gin.Context) {
     //
     job := worker.Job{Name: "test", Value: &e}
     EventJobQueue <- job
-    print(&e)
+    //print(&e)
 
     //content := map[string]interface{}{"status": "ok"}
     c.JSON(201, e)

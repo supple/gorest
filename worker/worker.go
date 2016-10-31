@@ -3,7 +3,7 @@ package worker
 import (
     "fmt"
     "github.com/supple/gorest/core"
-
+    _ "github.com/supple/gorest/services"
     "github.com/supple/gorest/services"
 )
 
@@ -51,6 +51,7 @@ type Worker struct {
 
 func (w *Worker) doWork(app *core.AppServices, job Job) {
     services.SaveEvent(job.Value)
+
     //setValue(sc, &job)
 
     // decrement global counter

@@ -3,12 +3,18 @@ package services
 import (
 	"github.com/supple/gorest/storage"
 	"log"
+	"gopkg.in/mgo.v2"
 )
+var coll *mgo.Collection
+
+func init() {
+	coll = storage.GetInstance("events").Coll("events")
+}
 
 func SaveEvent(data interface{}) (error) {
-	err := storage.GetInstance("events").Coll("events").Insert(data)
+	err := coll.Insert(data)
 	if (err != nil) {
-		log.Println("Error: " + err.Error());
+		log.Println("[ERROR] Error: " + err.Error());
 	}
 
 	return err
