@@ -12,9 +12,10 @@ import (
     "os"
     "os/signal"
     "syscall"
-    "github.com/supple/gorest/events"
     "github.com/supple/gorest/worker"
     "github.com/gin-gonic/contrib/gzip"
+    "github.com/supple/gorest/handlers"
+    "strconv"
 )
 
 var app = core.AppServices{}
@@ -74,13 +75,13 @@ func InitCache(app *core.AppServices) {
 
 func init() {
     // Create the job queue.
-    maxQueueSize := 50
-    maxWorkers := 5
+    maxQueueSize, _ := strconv.Atoi(os.Args[1]) // 3
+    maxWorkers, _ := strconv.Atoi(os.Args[2])   // 50
 
-    events.EventJobQueue = make(chan worker.Job, maxQueueSize)
+    worker.EventJobQueue = make(chan worker.Job, maxQueueSize)
 
     // Start the dispatcher.
-    d := worker.NewDispatcher(events.EventJobQueue, maxWorkers)
+    d := worker.NewDispatcher(worker.EventJobQueue, maxWorkers)
     d.Run(&app)
 
     // dispatch worker producers
@@ -127,7 +128,7 @@ func main() {
     //r := gin.Default()
     v1 := r.Group("api/v1")
     {
-        v1.POST("/events", events.HandleEvents)
+        v1.POST("/events", handlers.HandleEvents)
     }
 
     r.Run(":8080")

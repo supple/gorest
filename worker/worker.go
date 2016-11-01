@@ -3,8 +3,7 @@ package worker
 import (
     "fmt"
     "github.com/supple/gorest/core"
-    _ "github.com/supple/gorest/services"
-    "github.com/supple/gorest/services"
+    "github.com/supple/gorest/events"
 )
 
 // Job holds the attributes needed to perform unit of work.
@@ -50,20 +49,7 @@ type Worker struct {
 //}
 
 func (w *Worker) doWork(app *core.AppServices, job Job) {
-    services.SaveEvent(job.Value)
-
-    //setValue(sc, &job)
-
-    // decrement global counter
-    /*
-    w.app.Cnt.Decr()
-    if (w.app.Cnt.Items == 0) {
-        fmt.Println("All work is done")
-        w.app.Quit <- true
-    }
-    */
-
-    //fmt.Fprintln("Do work: %s", job.Name)
+    events.SaveEvent(job.Value)
 }
 
 // run worker
@@ -117,7 +103,7 @@ func (d *Dispatcher) Run(app *core.AppServices) {
     for i := 0; i < d.maxWorkers; i++ {
         worker := NewWorker(i + 1, d.workerPool, app)
         worker.start(app)
-        fmt.Sprintf("Worker %d start\n", worker.id)
+        fmt.Printf("Worker %d start\n", worker.id)
     }
 }
 
@@ -125,7 +111,7 @@ func (d *Dispatcher) Dispatch() {
     for {
         select {
         case job := <-d.jobQueue:
-            go func() {
+            //go func() {
                 //fmt.Printf("fetching workerJobQueue for: %s\n", job.Name)
                 // get available worker
                 workerJobQueue := <-d.workerPool
@@ -133,7 +119,7 @@ func (d *Dispatcher) Dispatch() {
 
                 // send job to this worker
                 workerJobQueue <- job
-            }()
+            //}()
         }
     }
 }

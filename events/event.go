@@ -1,13 +1,8 @@
 package events
 
 import (
-    "time"
-    "github.com/gin-gonic/gin"
-    "github.com/rs/xid"
-    "github.com/supple/gorest/worker"
+    _ "github.com/rs/xid"
 )
-
-var EventJobQueue chan worker.Job
 
 type Payload map[string]interface{}
 
@@ -21,26 +16,6 @@ type Event struct {
     Request string `json:"request"`
 }
 
-func HandleEvents(c *gin.Context) {
-    var e Event
-
-    c.Bind(&e)
-    e.Id = xid.New().String()
-    e.Time = time.Now().Format("2006-01-02T15:04:05.999Z")
-
-    // -> add to queue
-    // check flow (context: {flowId, deviceId}) if no flow start timeout ->
-    // on beacon_entered, mac: "abc", time.hour: <15, 17>   -> setFlowStage() -> setFlowStartLock(timeout=10h)
-    // -> make flow action (route_info params:{DirectionsRequest} ) -> (If DurationInTraffic > Y) -> next task
-    // -> make flow action (send_ntf params:{route_msg {placeholders}})
-    //
-    job := worker.Job{Name: "test", Value: &e}
-    EventJobQueue <- job
-    //print(&e)
-
-    //content := map[string]interface{}{"status": "ok"}
-    c.JSON(201, e)
-}
 
 //type Events []Event
 //
