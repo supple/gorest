@@ -4,18 +4,16 @@ import (
     "fmt"
     "net/http"
     "encoding/json"
-    _ "log"
-
-    "github.com/gin-gonic/gin"
-    "github.com/supple/gorest/core"
-    "github.com/supple/gorest/storage"
     "os"
     "os/signal"
     "syscall"
-    "github.com/supple/gorest/worker"
-    "github.com/gin-gonic/contrib/gzip"
-    "github.com/supple/gorest/handlers"
     "strconv"
+    "github.com/gin-gonic/gin"
+    "github.com/gin-gonic/contrib/gzip"
+    "github.com/supple/gorest/core"
+    "github.com/supple/gorest/storage"
+    "github.com/supple/gorest/worker"
+    "github.com/supple/gorest/handlers"
 )
 
 var app = core.AppServices{}
