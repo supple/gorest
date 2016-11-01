@@ -7,13 +7,14 @@ import (
 type Payload map[string]interface{}
 
 type Event struct {
-    Id       string `json:"id"`
-    Name     string `json:"name"`
-    Time     string `json:"time, omitempty"` // joda time
-    AppId    string `json:"appId"`
-    DeviceId string `json:"deviceId"`
-    Payload  Payload `json:"payload, omitempty"` //Payload json.RawMessage `json:"payload, omitempty"`
-    Request string `json:"request"`
+    Id       string `json:"id" bson:"id"`
+    Name     string `json:"name" bson:"name"`
+    CustomerName string `json:"customerName" bson:"customerName"`
+    Time     string `json:"time, omitempty" bson:"time"` // joda time
+    AppId    string `json:"appId" bson:"appId"`
+    DeviceId string `json:"deviceId" bson:"deviceId"`
+    Payload  Payload `json:"payload, omitempty" bson:"payload"` //Payload json.RawMessage `json:"payload, omitempty"`
+    Request string `json:"request" bson:"request"`
 }
 
 

@@ -107,6 +107,12 @@ func CORSMiddleware() gin.HandlerFunc {
     }
 }
 
+func auth(c *gin.Context) {
+    cc := &core.CustomerContext{CustomerName: "test"}
+    c.Set("cc", cc)
+    c.Next()
+}
+
 func errorHandler(c *gin.Context) {
     c.Next()
 
@@ -121,7 +127,7 @@ func main() {
 
     r := gin.New()
     r.Use(gin.Recovery())
-    r.Use(errorHandler)
+    r.Use(auth)
     r.Use(gzip.Gzip(gzip.DefaultCompression))
     //r.Use(CORSMiddleware())
 

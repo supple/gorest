@@ -20,5 +20,6 @@ func (e *AppError) Error() string {
 type CustomerContext struct {
     ApiKey string
     AppId string
+    DeviceId string
     CustomerName string
 }
