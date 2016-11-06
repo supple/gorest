@@ -3,14 +3,19 @@ package handlers
 
 import (
     "time"
+    "log"
     "github.com/gin-gonic/gin"
     "github.com/supple/gorest/worker"
     "github.com/supple/gorest/utils"
     "github.com/supple/gorest/events"
     "github.com/supple/gorest/core"
+    "fmt"
 )
 
 func HandleEvents(c *gin.Context) {
+    fmt.Fprint(gin.DefaultWriter, "rwa")
+    log.Print("[GIN-debug] Request")
+    fmt.Printf("Worker %d start\n", 7)
     var e events.Event
 
     c.Bind(&e)

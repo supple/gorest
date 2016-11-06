@@ -5,12 +5,37 @@ import (
 	"github.com/supple/gorest/core"
 	s "github.com/supple/gorest/storage"
 	r "github.com/supple/gorest/resources"
+	"gopkg.in/mgo.v2"
+	"errors"
+)
+
+var (
+	//errUnknown = &core.APIError{Title: "unknown", Code: 401}
+	ErrInvalidApiKey= errors.New("Invalid api key")
 )
 
 type App struct {
 	Id     string `json:"id" bson:"_id"`
 	Name   string        `json:"name" bson:"name"`
 	GcmKey string        `json:"gcmKey" bson:"gcmKey"`
+}
+
+func Auth(db *s.MongoDB, apiKey string, accessTo r.AccessTo) (*core.CustomerContext, error) {
+	var cc *core.CustomerContext
+	akRp := r.NewApiKeyRP(cc)
+	ak, err := akRp.FindOneBy(db, bson.M{r.API_KEY_FIELD: apiKey})
+	// @todo: hasAccess(accessTo)
+	if err == mgo.ErrNotFound {
+		return nil, ErrInvalidApiKey
+	}
+	if (ak != nil) {
+		cc = &core.CustomerContext{}
+		// copy ot customer context
+		cc.ApiKey = ak.ApiKey
+		cc.CustomerName = ak.CustomerName
+		cc.AppId = ak.AppId
+	}
+	return cc, err
 }
 
 
@@ -36,20 +61,3 @@ type App struct {
 //	w.WriteHeader(201)
 //	fmt.Fprintf(w, "%s", uj)
 //}
-
-
-func Auth(db *s.MongoDB, apiKey string, accessTo r.AccessTo) (*core.CustomerContext, error) {
-	var cc *core.CustomerContext
-	akRp := r.NewApiKeyRP(cc)
-	ak, err := akRp.FindOneBy(db, bson.M{r.API_KEY_FIELD: apiKey})
-	// @todo: hasAccess(accessTo)
-	if err == nil {
-		cc = &core.CustomerContext{}
-        // copy ot customer context
-		cc.ApiKey = ak.ApiKey
-		cc.CustomerName = ak.CustomerName
-        cc.AppId = ak.AppId
-	}
-
-	return cc, err
-}

@@ -103,7 +103,7 @@ func (d *Dispatcher) Run(app *core.AppServices) {
     for i := 0; i < d.maxWorkers; i++ {
         worker := NewWorker(i + 1, d.workerPool, app)
         worker.start(app)
-        fmt.Printf("Worker %d start\n", worker.id)
+        //fmt.Printf("Worker %d start\n", worker.id)
     }
 }
 

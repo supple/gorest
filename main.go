@@ -9,11 +9,14 @@ import (
     "syscall"
     "strconv"
     "github.com/gin-gonic/gin"
-    "github.com/gin-gonic/contrib/gzip"
+
     "github.com/supple/gorest/core"
     "github.com/supple/gorest/storage"
     "github.com/supple/gorest/worker"
     "github.com/supple/gorest/handlers"
+    "errors"
+    "log"
+    "github.com/supple/gorest/resources"
 )
 
 var app = core.AppServices{}
@@ -72,6 +75,8 @@ func InitCache(app *core.AppServices) {
 //}
 
 func init() {
+    storage.SetInstance("crm", storage.NewMongoDB("192.168.1.106:27017", "crm"))
+
     // Create the job queue.
     maxQueueSize, _ := strconv.Atoi(os.Args[1]) // 3
     maxWorkers, _ := strconv.Atoi(os.Args[2])   // 50
@@ -92,7 +97,6 @@ func signalCatcher() chan os.Signal {
     return c
 }
 
-
 func CORSMiddleware() gin.HandlerFunc {
     return func(c *gin.Context) {
         c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
@@ -106,14 +110,31 @@ func CORSMiddleware() gin.HandlerFunc {
 }
 
 func auth(c *gin.Context) {
-    cc := &core.CustomerContext{CustomerName: "test"}
+    fmt.Fprint(gin.DefaultWriter, "rwa\n")
+    fmt.Println("Apikey: "+c.Request.Header.Get("API-KEY"))
+    log.Print("[x] Request\n")
+
+    ac := resources.AccessTo{Resource: "test", Action:"test"}
+    cc, err := Auth(storage.GetInstance("crm"), c.Request.Header.Get("API-KEY"), ac)
+
+    if err == ErrInvalidApiKey {
+        c.Writer.Header().Set("Content-Type", "application/json; charset=utf-8")
+        c.AbortWithError(401, errors.New("Invalid api key"))
+        return
+    }
+
+    if err != nil {
+        c.Writer.Header().Set("Content-Type", "application/json; charset=utf-8")
+        c.AbortWithError(500, err)
+        return
+    }
+
     c.Set("cc", cc)
     c.Next()
 }
 
 func errorHandler(c *gin.Context) {
     c.Next()
-
     if len(c.Errors)>0 {
         c.JSON(-1, c.Errors) // -1 == not override the current error code
     }
@@ -125,8 +146,10 @@ func main() {
 
     r := gin.New()
     r.Use(gin.Recovery())
+    r.Use(gin.Logger())
+    r.Use(errorHandler)
     r.Use(auth)
-    r.Use(gzip.Gzip(gzip.DefaultCompression))
+    //r.Use(gzip.Gzip(gzip.DefaultCompression))
     //r.Use(CORSMiddleware())
 
     //r := gin.Default()

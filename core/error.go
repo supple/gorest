@@ -1,4 +1,4 @@
-package main
+package core
 
 import (
     "runtime"
@@ -15,7 +15,7 @@ func (errors *APIErrors) Status() int {
 
 type APIError struct {
     Status      int         `json:"status"`
-    Code        string      `json:"code"`
+    Code        int      `json:"code"`
     Title       string      `json:"title"`
     Details     string      `json:"details"`
     Href        string      `json:"href"`

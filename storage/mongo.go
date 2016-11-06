@@ -8,10 +8,10 @@ import (
 var instances map[string]*MongoDB = make(map[string]*MongoDB)
 
 func init()  {
-    db := NewMongoDB("192.168.1.105:27017", "lcache")
+    db := NewMongoDB("192.168.1.106:27017", "lcache")
     instances["entities"] = db
 
-	dbEvents := NewMongoDB("192.168.1.105:27017", "events")
+	dbEvents := NewMongoDB("192.168.1.106:27017", "events")
 	instances["events"] = dbEvents
 }
 
