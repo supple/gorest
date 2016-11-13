@@ -6,7 +6,6 @@ import (
     "github.com/supple/gorest/core"
     s "github.com/supple/gorest/storage"
     lc "github.com/supple/gorest/utils"
-    "github.com/supple/go-evento/storage"
 )
 
 const REPO_CUSTOMER = "crm"
@@ -34,18 +33,18 @@ func NewCustomerRP(cc *core.CustomerContext) *CustomerRP {
 
 func (rp *CustomerRP) Create(db *s.MongoDB, model *Customer) error {
     model.Hash = lc.RandString(8)
-    return rp.gt.Insert(db, model)
+    return rp.gt.Insert(model)
 }
 
 func (rp *CustomerRP) Update(id string, model *map[string]interface{}) error {
     //err := db.Coll(rp.CollectionName()).Update(bson.M{"_id": id}, model)
-    err := rp.gt.Update(bson.M{"_id": id}, model)
+    err := rp.gt.Update(id, model)
     return err
 }
 
-func (rp *CustomerRP) FindOne(db *s.MongoDB, id string) (*Customer, error) {
+func (rp *CustomerRP) FindOne(id string) (*Customer, error) {
 	result := &Customer{}
-    err := rp.gt.FindById(db, id, result)
+    err := rp.gt.FindById(id, result)
 	return result, err
 }
 
@@ -56,14 +55,14 @@ func (rp *CustomerRP) FindOneByName(customerName string) (*Customer, error) {
 	return result, err
 }
 
-func (rp *CustomerRP) FindOneBy(db *s.MongoDB, conditions bson.M) (*Customer, error) {
+func (rp *CustomerRP) FindOneBy(conditions bson.M) (*Customer, error) {
 	result := &Customer{}
-    err := rp.gt.FindOneBy(db, conditions, result)
+    err := rp.gt.FindOneBy(conditions, result)
 	return result, err
 }
 
-func (rp *CustomerRP) Delete(db *s.MongoDB, id string) (error) {
-	err := rp.gt.Remove(db, id)
+func (rp *CustomerRP) Delete(id string) (error) {
+	err := rp.gt.Remove(id)
 	return err
 }
 

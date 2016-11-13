@@ -30,30 +30,30 @@ func NewAppRP(cc *core.CustomerContext) *AppRP {
     return rp
 }
 
-func (rp *AppRP) Create(db *s.MongoDB, model *App) error {
+func (rp *AppRP) Create(model *App) error {
     model.CustomerName = rp.cc.CustomerName
-    return rp.gt.Insert(db, model)
+    return rp.gt.Insert(model)
 }
 
-func (rp *AppRP) Update(db *s.MongoDB, id string, model *map[string]interface{}) error {
-    err := rp.gt.Update(bson.M{"_id": id}, model)
+func (rp *AppRP) Update(id string, model *map[string]interface{}) error {
+    err := rp.gt.Update(id, model)
     return err
 }
 
-func (rp *AppRP) FindOne(db *s.MongoDB, id string) (*App, error) {
+func (rp *AppRP) FindOne(id string) (*App, error) {
     result := &App{}
-    err := rp.gt.FindById(db, id, result)
+    err := rp.gt.FindById(id, result)
     return result, err
 }
 
-func (rp *AppRP) FindOneBy(db *s.MongoDB, conditions bson.M) (*App, error) {
+func (rp *AppRP) FindOneBy(conditions bson.M) (*App, error) {
     result := &App{}
-    err := rp.gt.FindOneBy(db, conditions, result)
+    err := rp.gt.FindOneBy(conditions, result)
     return result, err
 }
 
-func (rp *AppRP) Delete(db *s.MongoDB, id string) (error) {
-    err := rp.gt.Remove(db, id)
+func (rp *AppRP) Delete(id string) (error) {
+    err := rp.gt.Remove(id)
     return err
 }
 
@@ -68,6 +68,6 @@ func CreateApp(db *s.MongoDB, cc *core.CustomerContext, os string, gcmToken stri
     app.GcmToken = gcmToken
     app.Os = os
 
-    err := aRp.Create(db, app)
+    err := aRp.Create(app)
     return app, err
 }

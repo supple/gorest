@@ -54,20 +54,20 @@ func (rp *ApiKeyRP) Create(model *ApiKey) error {
     return err
 }
 
-func (rp *ApiKeyRP) FindOne(db *s.MongoDB, id string) (*ApiKey, error) {
+func (rp *ApiKeyRP) FindOne(id string) (*ApiKey, error) {
     result := &ApiKey{}
-    err := rp.gt.FindById(db, id, result)
+    err := rp.gt.FindById(id, result)
     return result, err
 }
 
-func (rp *ApiKeyRP) FindOneBy(db *s.MongoDB, conditions bson.M) (*ApiKey, error) {
+func (rp *ApiKeyRP) FindOneBy(conditions bson.M) (*ApiKey, error) {
     result := &ApiKey{}
-    err := rp.gt.FindInsecureOneBy(db, conditions, result)
+    err := rp.gt.FindInsecureOneBy(conditions, result)
     return result, err
 }
 
-func (rp *ApiKeyRP) Delete(db *s.MongoDB, id string) (error) {
-    err := rp.gt.Remove(db, id)
+func (rp *ApiKeyRP) Delete(id string) (error) {
+    err := rp.gt.Remove(id)
     return err
 }
 

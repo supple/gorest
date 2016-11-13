@@ -134,7 +134,7 @@ func TestApiKey(t *testing.T) {
     // create api key
     ak := &r.ApiKey{}
     ak.CustomerName = model.CustomerName
-    err = akRp.Create(db, ak)
+    err = akRp.Create(ak)
 
     fmt.Println(ak.ApiKey)
 }

@@ -40,8 +40,8 @@ func (rp *DeviceRP) Create(model *Device) error {
     return rp.gt.Insert(model)
 }
 
-func (rp *DeviceRP) Update(db *s.MongoDB, id string, model *map[string]interface{}) error {
-    err := rp.gt.Update(bson.M{"_id": id}, model)
+func (rp *DeviceRP) Update(id string, model *map[string]interface{}) error {
+    err := rp.gt.Update(id, model)
     return err
 }
 
@@ -52,9 +52,9 @@ func (rp *DeviceRP) FindOne(id string) (*Device, error) {
     return result, err
 }
 
-func (rp *DeviceRP) FindOneBy(db *s.MongoDB, conditions bson.M) (*Device, error) {
+func (rp *DeviceRP) FindOneBy(conditions bson.M) (*Device, error) {
     result := &Device{}
-    err := rp.gt.FindOneBy(db, conditions, result)
+    err := rp.gt.FindOneBy(conditions, result)
     return result, err
 }
 

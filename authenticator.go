@@ -3,7 +3,6 @@ package main
 import (
 	"gopkg.in/mgo.v2/bson"
 	"github.com/supple/gorest/core"
-	s "github.com/supple/gorest/storage"
 	r "github.com/supple/gorest/resources"
 	"gopkg.in/mgo.v2"
 )
@@ -17,10 +16,9 @@ type App struct {
 
 func Auth(apiKey string, accessTo r.AccessTo) (*core.CustomerContext, error) {
 	var cc *core.CustomerContext
-    db := s.GetInstance("crm")
 
 	akRp := r.NewApiKeyRP(cc)
-	ak, err := akRp.FindOneBy(db, bson.M{r.API_KEY_FIELD: apiKey})
+	ak, err := akRp.FindOneBy(bson.M{r.API_KEY_FIELD: apiKey})
 	// @todo: hasAccess(accessTo)
 	if err == mgo.ErrNotFound {
 		return nil, core.ErrInvalidApiKey
