@@ -6,13 +6,8 @@ import (
 	s "github.com/supple/gorest/storage"
 	r "github.com/supple/gorest/resources"
 	"gopkg.in/mgo.v2"
-	"errors"
 )
 
-var (
-	//errUnknown = &core.APIError{Title: "unknown", Code: 401}
-	ErrInvalidApiKey= errors.New("Invalid api key")
-)
 
 type App struct {
 	Id     string `json:"id" bson:"_id"`
@@ -20,13 +15,15 @@ type App struct {
 	GcmKey string        `json:"gcmKey" bson:"gcmKey"`
 }
 
-func Auth(db *s.MongoDB, apiKey string, accessTo r.AccessTo) (*core.CustomerContext, error) {
+func Auth(apiKey string, accessTo r.AccessTo) (*core.CustomerContext, error) {
 	var cc *core.CustomerContext
+    db := s.GetInstance("crm")
+
 	akRp := r.NewApiKeyRP(cc)
 	ak, err := akRp.FindOneBy(db, bson.M{r.API_KEY_FIELD: apiKey})
 	// @todo: hasAccess(accessTo)
 	if err == mgo.ErrNotFound {
-		return nil, ErrInvalidApiKey
+		return nil, core.ErrInvalidApiKey
 	}
 	if (ak != nil) {
 		cc = &core.CustomerContext{}

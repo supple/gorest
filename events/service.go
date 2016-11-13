@@ -7,11 +7,14 @@ import (
 )
 var coll *mgo.Collection
 
-func init() {
-	coll = storage.GetInstance("events").Coll("events")
-}
+//func init() {
+//	coll = storage.GetInstance("events").Coll("events")
+//}
 
 func SaveEvent(data interface{}) (error) {
+    if (coll == nil) {
+        coll = storage.GetInstance("events").Coll("events")
+    }
 	err := coll.Insert(data)
 	if (err != nil) {
 		log.Println("[ERROR] Error: " + err.Error());

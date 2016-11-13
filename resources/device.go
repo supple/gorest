@@ -6,6 +6,8 @@ import (
     s "github.com/supple/gorest/storage"
 )
 
+const REPO_DEVICE = "crm"
+
 type Device struct {
     CustomerBased `bson:",inline"`
     AppId      string        `json:"appId" bson:"appId" `
@@ -22,29 +24,30 @@ type DeviceRP struct {
 
 func NewDeviceRP(cc *core.CustomerContext) *DeviceRP {
     rp := &DeviceRP{cc: cc}
-    gt := core.NewGateway(rp.CollectionName(), cc)
+    db := s.GetInstance(REPO_DEVICE)
+    gt := core.NewGateway(rp.CollectionName(), cc, db)
     rp.gt = gt
 
     return rp
 }
 
-func (rp *DeviceRP) Create(db *s.MongoDB, model *Device) error {
-    err := rp.ConstraintsValidation(db, model)
+func (rp *DeviceRP) Create(model *Device) error {
+    err := rp.ConstraintsValidation(model)
     if (err != nil) {
         return err
     }
 
-    return rp.gt.Insert(db, model)
+    return rp.gt.Insert(model)
 }
 
 func (rp *DeviceRP) Update(db *s.MongoDB, id string, model *map[string]interface{}) error {
-    err := db.Coll(rp.CollectionName()).Update(bson.M{"_id": id}, model)
+    err := rp.gt.Update(bson.M{"_id": id}, model)
     return err
 }
 
-func (rp *DeviceRP) FindOne(db *s.MongoDB, id string) (*Device, error) {
+func (rp *DeviceRP) FindOne(id string) (*Device, error) {
     result := &Device{}
-    err := rp.gt.FindById(db, id, result)
+    err := rp.gt.FindById(id, result)
 
     return result, err
 }
@@ -55,22 +58,22 @@ func (rp *DeviceRP) FindOneBy(db *s.MongoDB, conditions bson.M) (*Device, error)
     return result, err
 }
 
-func (rp *DeviceRP) Delete(db *s.MongoDB, id string) (error) {
-    err := rp.gt.Remove(db, id)
+func (rp *DeviceRP) Delete(id string) (error) {
+    err := rp.gt.Remove(id)
     return err
 }
 
 
-func (rp *DeviceRP) ConstraintsValidation(db *s.MongoDB, model *Device) (error) {
+func (rp *DeviceRP) ConstraintsValidation(model *Device) (error) {
     var err error
     csRp := NewCustomerRP(rp.cc)
-    _, err = csRp.FindOneByName(db, model.CustomerName)
+    _, err = csRp.FindOneByName(model.CustomerName)
     if (err != nil) {
         return &ErrObjectNotFound{"Customer", model.CustomerName}
     }
 
     appRp := NewAppRP(rp.cc)
-    _, err = appRp.FindOne(db, model.AppId)
+    _, err = appRp.FindOne(model.AppId)
     if (err != nil) {
         return &ErrObjectNotFound{"App", model.AppId}
     }

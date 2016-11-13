@@ -6,7 +6,10 @@ import (
     "github.com/supple/gorest/core"
     s "github.com/supple/gorest/storage"
     lc "github.com/supple/gorest/utils"
+    "github.com/supple/go-evento/storage"
 )
+
+const REPO_CUSTOMER = "crm"
 
 type Customer struct {
     CustomerBased `bson:",inline"`
@@ -22,7 +25,8 @@ type CustomerRP struct{
 
 func NewCustomerRP(cc *core.CustomerContext) *CustomerRP {
     rp := &CustomerRP{cc:cc}
-    gt := core.NewGateway(rp.CollectionName(), cc)
+    db := s.GetInstance(REPO_CUSTOMER)
+    gt := core.NewGateway(rp.CollectionName(), cc, db)
     rp.gt = gt
 
     return rp
@@ -33,8 +37,9 @@ func (rp *CustomerRP) Create(db *s.MongoDB, model *Customer) error {
     return rp.gt.Insert(db, model)
 }
 
-func (rp *CustomerRP) Update(db *s.MongoDB, id string, model *map[string]interface{}) error {
-    err := db.Coll(rp.CollectionName()).Update(bson.M{"_id": id}, model)
+func (rp *CustomerRP) Update(id string, model *map[string]interface{}) error {
+    //err := db.Coll(rp.CollectionName()).Update(bson.M{"_id": id}, model)
+    err := rp.gt.Update(bson.M{"_id": id}, model)
     return err
 }
 
@@ -44,10 +49,10 @@ func (rp *CustomerRP) FindOne(db *s.MongoDB, id string) (*Customer, error) {
 	return result, err
 }
 
-func (rp *CustomerRP) FindOneByName(db *s.MongoDB, customerName string) (*Customer, error) {
+func (rp *CustomerRP) FindOneByName(customerName string) (*Customer, error) {
 	result := &Customer{}
     conditions := bson.M{CUSTOMER_NAME_FIELD: customerName}
-	err := rp.gt.FindOneBy(db, conditions, result)
+	err := rp.gt.FindOneBy(conditions, result)
 	return result, err
 }
 

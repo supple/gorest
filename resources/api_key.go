@@ -10,6 +10,7 @@ import (
 )
 
 const API_KEY_FIELD string = "apiKey"
+const API_KEY_REPO = "crm"
 
 type ApiKey struct {
     CustomerBased `bson:",inline"`
@@ -22,22 +23,24 @@ type ApiKey struct {
 type ApiKeyRP struct {
     gt *core.Gateway
     cc *core.CustomerContext
+    db *s.MongoDB
 }
 
 func NewApiKeyRP(cc *core.CustomerContext) *ApiKeyRP {
     rp := &ApiKeyRP{cc:cc}
-    gt := core.NewGateway(rp.CollectionName(), cc)
+    db := s.GetInstance(API_KEY_REPO)
+    gt := core.NewGateway(rp.CollectionName(), cc, db)
     rp.gt = gt
 
     return rp
 }
 
-func (rp *ApiKeyRP) Create(db *s.MongoDB, model *ApiKey) error {
+func (rp *ApiKeyRP) Create(model *ApiKey) error {
     var err error
     model.CustomerName = rp.cc.CustomerName
 
      // validate
-    customer, err := rp.ConstraintsValidation(db, model)
+    customer, err := rp.ConstraintsValidation(model)
     if (err != nil) {
         return &ErrObjectNotFound{"Customer", rp.cc.CustomerName}
     }
@@ -46,7 +49,7 @@ func (rp *ApiKeyRP) Create(db *s.MongoDB, model *ApiKey) error {
     if (len(model.ApiKey) == 0) {
         model.ApiKey = fmt.Sprintf("%s-%s", lc.RandString(24), customer.Hash)
     }
-    err = rp.gt.Insert(db, model)
+    err = rp.gt.Insert(model)
     fmt.Println(model)
     return err
 }
@@ -68,9 +71,9 @@ func (rp *ApiKeyRP) Delete(db *s.MongoDB, id string) (error) {
     return err
 }
 
-func (rp *ApiKeyRP) ConstraintsValidation(db *s.MongoDB, model *ApiKey) (*Customer, error) {
+func (rp *ApiKeyRP) ConstraintsValidation(model *ApiKey) (*Customer, error) {
     csRp := NewCustomerRP(rp.cc)
-    c, err := csRp.FindOneByName(db, model.CustomerName)
+    c, err := csRp.FindOneByName(model.CustomerName)
     if (c == nil) {
         return nil, ErrNotFound
     }
@@ -86,7 +89,7 @@ func CreateApiKey(db *s.MongoDB, cc *core.CustomerContext) (*ApiKey, error) {
     akRp := NewApiKeyRP(cc)
     ak := &ApiKey{}
     ak.CustomerName = cc.CustomerName
-    err := akRp.Create(db, ak)
+    err := akRp.Create(ak)
 
     return ak, err
 }

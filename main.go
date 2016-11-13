@@ -4,18 +4,16 @@ import (
     "fmt"
     "net/http"
     "encoding/json"
-    "os"
-    "os/signal"
     "syscall"
     "strconv"
+    "log"
+    "os"
+    "os/signal"
     "github.com/gin-gonic/gin"
-
     "github.com/supple/gorest/core"
     "github.com/supple/gorest/storage"
     "github.com/supple/gorest/worker"
     "github.com/supple/gorest/handlers"
-    "errors"
-    "log"
     "github.com/supple/gorest/resources"
 )
 
@@ -75,11 +73,18 @@ func InitCache(app *core.AppServices) {
 //}
 
 func init() {
+    // Init storage instances
     storage.SetInstance("crm", storage.NewMongoDB("192.168.1.106:27017", "crm"))
+    storage.SetInstance("entities", storage.NewMongoDB("192.168.1.106:27017", "entities"))
+    storage.SetInstance("events", storage.NewMongoDB("192.168.1.106:27017", "events"))
 
     // Create the job queue.
-    maxQueueSize, _ := strconv.Atoi(os.Args[1]) // 3
-    maxWorkers, _ := strconv.Atoi(os.Args[2])   // 50
+    var maxQueueSize = 3
+    var maxWorkers = 50
+    if len(os.Args) > 2 {
+        maxQueueSize, _ = strconv.Atoi(os.Args[1]) // 3
+        maxWorkers, _ = strconv.Atoi(os.Args[2])   // 50
+    }
 
     worker.EventJobQueue = make(chan worker.Job, maxQueueSize)
 
@@ -109,31 +114,40 @@ func CORSMiddleware() gin.HandlerFunc {
     }
 }
 
-func auth(c *gin.Context) {
-    fmt.Fprint(gin.DefaultWriter, "rwa\n")
-    fmt.Println("Apikey: "+c.Request.Header.Get("API-KEY"))
+func AuthMiddleware(c *gin.Context) {
     log.Print("[x] Request\n")
-
+    // YADPwshFjiJWCcqEggFwOzHM-mGwlIxvC
     ac := resources.AccessTo{Resource: "test", Action:"test"}
-    cc, err := Auth(storage.GetInstance("crm"), c.Request.Header.Get("API-KEY"), ac)
+    cc, err := Auth(c.Request.Header.Get("API-KEY"), ac)
 
-    if err == ErrInvalidApiKey {
-        c.Writer.Header().Set("Content-Type", "application/json; charset=utf-8")
-        c.AbortWithError(401, errors.New("Invalid api key"))
-        return
-    }
-
-    if err != nil {
+    switch err.(type) {
+        case *core.APIError:
+            ae := err.(*core.APIError)
+            c.Writer.Header().Set("Content-Type", "application/json; charset=utf-8")
+            c.AbortWithError(ae.Status, ae)
+            return
+    case error:
         c.Writer.Header().Set("Content-Type", "application/json; charset=utf-8")
         c.AbortWithError(500, err)
         return
     }
+    //if (err == core.ErrInvalidApiKey) {
+    //    c.Writer.Header().Set("Content-Type", "application/json; charset=utf-8")
+    //    c.AbortWithError(401, core.ErrInvalidApiKey)
+    //    return
+    //}
+    //
+    //if err != nil {
+    //    c.Writer.Header().Set("Content-Type", "application/json; charset=utf-8")
+    //    c.AbortWithError(500, err)
+    //    return
+    //}
 
     c.Set("cc", cc)
     c.Next()
 }
 
-func errorHandler(c *gin.Context) {
+func ErrorHandler(c *gin.Context) {
     c.Next()
     if len(c.Errors)>0 {
         c.JSON(-1, c.Errors) // -1 == not override the current error code
@@ -147,16 +161,25 @@ func main() {
     r := gin.New()
     r.Use(gin.Recovery())
     r.Use(gin.Logger())
-    r.Use(errorHandler)
-    r.Use(auth)
+    r.Use(ErrorHandler)
+    r.Use(AuthMiddleware)
+
     //r.Use(gzip.Gzip(gzip.DefaultCompression))
     //r.Use(CORSMiddleware())
+    ca := handlers.CustomerApi{}
 
     //r := gin.Default()
     v1 := r.Group("api/v1")
     {
         v1.POST("/events", handlers.HandleEvents)
+
+        v1.GET("/customers", ca.CampaignGet)
+        v1.POST("/customers", ca.CampaignPost)
     }
+    // customers
+    // api-keys
+    // apps
+    // devices
 
     r.Run(":8080")
 }

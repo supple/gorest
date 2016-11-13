@@ -3,16 +3,17 @@ package storage
 import (
 	"gopkg.in/mgo.v2"
 	"fmt"
+    "time"
 )
 
 var instances map[string]*MongoDB = make(map[string]*MongoDB)
 
 func init()  {
-    db := NewMongoDB("192.168.1.106:27017", "lcache")
-    instances["entities"] = db
-
-	dbEvents := NewMongoDB("192.168.1.106:27017", "events")
-	instances["events"] = dbEvents
+    //db := NewMongoDB("192.168.1.106:27017", "lcache")
+    //instances["entities"] = db
+    //
+	//dbEvents := NewMongoDB("192.168.1.106:27017", "events")
+	//instances["events"] = dbEvents
 }
 
 func SetInstance(name string, db *MongoDB) {
@@ -24,23 +25,25 @@ func GetInstance(name string) *MongoDB {
 }
 
 func NewMongoDB(url string, dbName string) *MongoDB {
-	session, err := mgo.Dial(url)
+	session, err := mgo.DialWithTimeout(url, time.Second * 5)
 	if err != nil {
 		panic(fmt.Sprintf("Mongodb not found %s", url))
 	}
-	m := &MongoDB{session: session, dbName: dbName}
+
+	m := &MongoDB{Session: session, dbName: dbName}
 
 	return m
 }
 
 type MongoDB struct {
-	session *mgo.Session
+    Session *mgo.Session
 	// db mgo.Database
-	dbName  string
+    dbName  string
 }
 
 func (m *MongoDB) Coll(collName string) *mgo.Collection {
-	return m.session.DB(m.dbName).C(collName)
+    //m.Session.Refresh()
+	return m.Session.DB(m.dbName).C(collName)
 }
 
 func DropCollection(db *MongoDB, cn string) {

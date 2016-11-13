@@ -6,6 +6,8 @@ import (
     "github.com/supple/gorest/core"
 )
 
+const REPO_APP = "crm"
+
 type App struct {
     CustomerBased `bson:",inline"`
     AppId    string        `json:"name" bson:"name" `
@@ -22,7 +24,8 @@ type AppRP struct {
 
 func NewAppRP(cc *core.CustomerContext) *AppRP {
     rp := &AppRP{cc:cc}
-    gt := core.NewGateway(rp.CollectionName(), cc)
+    db := s.GetInstance(REPO_APP)
+    gt := core.NewGateway(rp.CollectionName(), cc, db)
     rp.gt = gt
     return rp
 }
@@ -33,7 +36,7 @@ func (rp *AppRP) Create(db *s.MongoDB, model *App) error {
 }
 
 func (rp *AppRP) Update(db *s.MongoDB, id string, model *map[string]interface{}) error {
-    err := db.Coll(rp.CollectionName()).Update(bson.M{"_id": id}, model)
+    err := rp.gt.Update(bson.M{"_id": id}, model)
     return err
 }
 
