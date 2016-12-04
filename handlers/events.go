@@ -3,7 +3,6 @@ package handlers
 
 import (
     "time"
-    "log"
     "github.com/gin-gonic/gin"
     "github.com/supple/gorest/worker"
     "github.com/supple/gorest/utils"
@@ -13,7 +12,7 @@ import (
 )
 
 func HandleEvents(c *gin.Context) {
-    log.Print("[GIN-debug] Request")
+    //log.Print("[GIN-debug] Request")
     var e events.Event
 
     c.Bind(&e)

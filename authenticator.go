@@ -1,10 +1,7 @@
 package main
 
 import (
-	"gopkg.in/mgo.v2/bson"
-	"github.com/supple/gorest/core"
-	r "github.com/supple/gorest/resources"
-	"gopkg.in/mgo.v2"
+
 )
 
 
@@ -14,24 +11,6 @@ type App struct {
 	GcmKey string        `json:"gcmKey" bson:"gcmKey"`
 }
 
-func Auth(apiKey string, accessTo r.AccessTo) (*core.CustomerContext, error) {
-	var cc *core.CustomerContext
-
-	akRp := r.NewApiKeyRP(cc)
-	ak, err := akRp.FindOneBy(bson.M{r.API_KEY_FIELD: apiKey})
-	// @todo: hasAccess(accessTo)
-	if err == mgo.ErrNotFound {
-		return nil, core.ErrInvalidApiKey
-	}
-	if (ak != nil) {
-		cc = &core.CustomerContext{}
-		// copy ot customer context
-		cc.ApiKey = ak.ApiKey
-		cc.CustomerName = ak.CustomerName
-		cc.AppId = ak.AppId
-	}
-	return cc, err
-}
 
 
 //// CreateUser creates a new user resource

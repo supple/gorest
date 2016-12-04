@@ -49,3 +49,7 @@ func (m *MongoDB) Coll(collName string) *mgo.Collection {
 func DropCollection(db *MongoDB, cn string) {
     db.Coll(cn).DropCollection()
 }
+
+func DropDatabase(db *MongoDB) {
+    db.Session.DB(db.dbName).DropDatabase()
+}

@@ -7,7 +7,6 @@ import (
     "reflect"
     "gopkg.in/mgo.v2"
     "io"
-    "time"
 )
 
 type Gateway struct {
@@ -21,9 +20,7 @@ func NewGateway(collectionName string, cc *CustomerContext, db *s.MongoDB) *Gate
     return &Gateway{collectionName: collectionName, cc: cc, db: db}
 }
 
-func (gt *Gateway) getColl() {
-
-}
+func (gt *Gateway) getColl() {}
 
 func (gt *Gateway) Insert(model interface{}) error {
     // generate id
@@ -35,46 +32,59 @@ func (gt *Gateway) Insert(model interface{}) error {
     err := gt.db.Coll(gt.collectionName).Insert(model)
     handleError(gt.db, err)
 
-    return err
+    return gt.toApiError(err)
 }
 
 func (gt *Gateway) Update(id string, model *map[string]interface{}) error {
     err := gt.db.Coll(gt.collectionName).Update(bson.M{"_id": id}, model)
     handleError(gt.db, err)
 
-    return err
+    return gt.toApiError(err)
 }
 
-func (gt *Gateway) Remove(id string) (error) {
+func (gt *Gateway) Remove(id string) error {
     q := bson.M{"_id": id, "customerName": gt.cc.CustomerName}
     err := gt.db.Coll(gt.collectionName).Remove(q)
     handleError(gt.db, err)
 
-    return err
+    return gt.toApiError(err)
 }
 
-func (gt *Gateway) FindById(id string, result interface{}) error {
+func (gt *Gateway) FindById(id string, result interface{}) error  {
     q := bson.M{"_id": id, "customerName": gt.cc.CustomerName}
     err := gt.db.Coll(gt.collectionName).Find(q).One(result)
     handleError(gt.db, err)
 
-    return err
+    return gt.toApiError(err)
 }
 
-func (gt *Gateway) FindOneBy(conditions bson.M, result interface{}) error {
+func (gt *Gateway) FindOneBy(conditions bson.M, result interface{}) error  {
     conditions["customerName"] = gt.cc.CustomerName
     err := gt.db.Coll(gt.collectionName).Find(conditions).One(result)
     handleError(gt.db, err)
 
-    return err
+    return gt.toApiError(err)
 }
 
 // Find element without customer context
-func (gt *Gateway) FindInsecureOneBy(conditions bson.M, result interface{}) error {
-    time.Sleep(time.Second)
+func (gt *Gateway) FindOneWithoutContextBy(conditions bson.M, result interface{}) error  {
+    //time.Sleep(time.Second)
     err := gt.db.Coll(gt.collectionName).Find(conditions).One(result)
     handleError(gt.db, err)
-    return err
+
+    return gt.toApiError(err)
+}
+
+func (gt *Gateway) toApiError(err error) error {
+    if (err == io.EOF) {
+        return ErrDatabase
+    }
+    if (err == mgo.ErrNotFound) {
+        //return Err404
+        return &ErrObjectNotFound{gt.collectionName, ""}
+    }
+
+    return nil
 }
 
 func handleError(db *s.MongoDB, err error) {

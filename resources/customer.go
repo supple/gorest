@@ -4,7 +4,7 @@ import (
     "gopkg.in/mgo.v2"
     "gopkg.in/mgo.v2/bson"
     "github.com/supple/gorest/core"
-    s "github.com/supple/gorest/storage"
+    "github.com/supple/gorest/storage"
     lc "github.com/supple/gorest/utils"
 )
 
@@ -24,16 +24,26 @@ type CustomerRP struct{
 
 func NewCustomerRP(cc *core.CustomerContext) *CustomerRP {
     rp := &CustomerRP{cc:cc}
-    db := s.GetInstance(REPO_CUSTOMER)
+    db := storage.GetInstance(REPO_CUSTOMER)
     gt := core.NewGateway(rp.CollectionName(), cc, db)
     rp.gt = gt
 
     return rp
 }
 
-func (rp *CustomerRP) Create(db *s.MongoDB, model *Customer) error {
-    model.Hash = lc.RandString(8)
-    return rp.gt.Insert(model)
+func (rp *CustomerRP) Create(model *Customer) error {
+    _, err := rp.FindOneByName(model.CustomerName)
+    if (err != nil) {
+        _, ok := err.(*core.ErrObjectNotFound)
+        if (!ok) {
+            return err
+        }
+
+        model.Hash = lc.RandString(8)
+        return rp.gt.Insert(model)
+    }
+
+    return err
 }
 
 func (rp *CustomerRP) Update(id string, model *map[string]interface{}) error {
@@ -70,16 +80,19 @@ func (rp CustomerRP) CollectionName() string {
 	return "Customer"
 }
 
-func CreateCustomer(db *s.MongoDB, name string) (*Customer, error) {
+func CreateCustomer(name string) (*Customer, error) {
     cc := &core.CustomerContext{CustomerName: name}
     cRp := NewCustomerRP(cc)
     c := &Customer{}
     c.CustomerName = name
-    err := cRp.Create(db, c)
+    err := cRp.Create(c)
+    if (err != nil) {
+        return nil, err
+    }
     return c, err
 }
 
-func (rp *CustomerRP) Install(db *s.MongoDB) error {
+func (rp *CustomerRP) Install(db *storage.MongoDB) error {
 	index := mgo.Index{
 		Key: []string{CUSTOMER_NAME_FIELD},
 		Unique: true,

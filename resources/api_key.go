@@ -42,8 +42,9 @@ func (rp *ApiKeyRP) Create(model *ApiKey) error {
      // validate
     customer, err := rp.ConstraintsValidation(model)
     if (err != nil) {
-        return &ErrObjectNotFound{"Customer", rp.cc.CustomerName}
+        return err
     }
+
     fmt.Println("OK CUST is")
     // create key if not set
     if (len(model.ApiKey) == 0) {
@@ -62,7 +63,8 @@ func (rp *ApiKeyRP) FindOne(id string) (*ApiKey, error) {
 
 func (rp *ApiKeyRP) FindOneBy(conditions bson.M) (*ApiKey, error) {
     result := &ApiKey{}
-    err := rp.gt.FindInsecureOneBy(conditions, result)
+    err := rp.gt.FindOneWithoutContextBy(conditions, result)
+
     return result, err
 }
 
@@ -74,8 +76,8 @@ func (rp *ApiKeyRP) Delete(id string) (error) {
 func (rp *ApiKeyRP) ConstraintsValidation(model *ApiKey) (*Customer, error) {
     csRp := NewCustomerRP(rp.cc)
     c, err := csRp.FindOneByName(model.CustomerName)
-    if (c == nil) {
-        return nil, ErrNotFound
+    if (err != nil) {
+        return nil, err
     }
 
     return c, err
@@ -85,7 +87,28 @@ func (rp ApiKeyRP) CollectionName() string {
     return "ApiKey"
 }
 
-func CreateApiKey(db *s.MongoDB, cc *core.CustomerContext) (*ApiKey, error) {
+func Auth(apiKey string, accessTo AccessTo) (*core.CustomerContext, error) {
+    var cc *core.CustomerContext
+
+    akRp := NewApiKeyRP(cc)
+    ak, err := akRp.FindOneBy(bson.M{API_KEY_FIELD: apiKey})
+    // @todo: hasAccess(accessTo)
+    if err == mgo.ErrNotFound {
+        return nil, core.ErrInvalidApiKey
+    }
+
+    if (ak != nil) {
+        cc = &core.CustomerContext{}
+        // copy to customer context
+        cc.ApiKey = ak.ApiKey
+        cc.CustomerName = ak.CustomerName
+        cc.AppId = ak.AppId
+    }
+
+    return cc, err
+}
+
+func CreateApiKey(cc *core.CustomerContext) (*ApiKey, error) {
     akRp := NewApiKeyRP(cc)
     ak := &ApiKey{}
     ak.CustomerName = cc.CustomerName

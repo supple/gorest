@@ -6,7 +6,6 @@ import (
     "encoding/json"
     "syscall"
     "strconv"
-    "log"
     "os"
     "os/signal"
     "github.com/gin-gonic/gin"
@@ -75,7 +74,7 @@ func InitCache(app *core.AppServices) {
 func init() {
     // Init storage instances
     storage.SetInstance("crm", storage.NewMongoDB("192.168.1.106:27017", "crm"))
-    storage.SetInstance("entities", storage.NewMongoDB("192.168.1.106:27017", "entities"))
+    //storage.SetInstance("entities", storage.NewMongoDB("192.168.1.106:27017", "entities"))
     storage.SetInstance("events", storage.NewMongoDB("192.168.1.106:27017", "events"))
 
     // Create the job queue.
@@ -115,41 +114,38 @@ func CORSMiddleware() gin.HandlerFunc {
 }
 
 func AuthMiddleware(c *gin.Context) {
-    log.Print("[x] Request\n")
-    // YADPwshFjiJWCcqEggFwOzHM-mGwlIxvC
+    //log.Print("[x] Request\n")
+    // zbCrVUXQSLseDVruJIBwYgke-cRaddKsc
     ac := resources.AccessTo{Resource: "test", Action:"test"}
-    cc, err := Auth(c.Request.Header.Get("API-KEY"), ac)
+    cc, err := resources.Auth(c.Request.Header.Get("API-KEY"), ac)
+
+    if err == nil {
+        c.Set("cc", cc)
+        c.Next()
+        return
+    }
+
+    // handle error
+    //log.Print()
 
     switch err.(type) {
-        case *core.APIError:
-            ae := err.(*core.APIError)
-            c.Writer.Header().Set("Content-Type", "application/json; charset=utf-8")
-            c.AbortWithError(ae.Status, ae)
-            return
+    case *core.ApiError:
+        ae := err.(*core.ApiError)
+        c.Writer.Header().Set("Content-Type", "application/json; charset=utf-8")
+        c.AbortWithError(ae.Status, ae)
+        return
     case error:
         c.Writer.Header().Set("Content-Type", "application/json; charset=utf-8")
         c.AbortWithError(500, err)
         return
     }
-    //if (err == core.ErrInvalidApiKey) {
-    //    c.Writer.Header().Set("Content-Type", "application/json; charset=utf-8")
-    //    c.AbortWithError(401, core.ErrInvalidApiKey)
-    //    return
-    //}
-    //
-    //if err != nil {
-    //    c.Writer.Header().Set("Content-Type", "application/json; charset=utf-8")
-    //    c.AbortWithError(500, err)
-    //    return
-    //}
 
-    c.Set("cc", cc)
-    c.Next()
+
 }
 
 func ErrorHandler(c *gin.Context) {
     c.Next()
-    if len(c.Errors)>0 {
+    if len(c.Errors) > 0 {
         c.JSON(-1, c.Errors) // -1 == not override the current error code
     }
 }
@@ -158,23 +154,28 @@ func main() {
     fmt.Println("v1.0.0")
     InitCache(&app)
 
+    gin.SetMode(gin.ReleaseMode)
     r := gin.New()
     r.Use(gin.Recovery())
     r.Use(gin.Logger())
-    r.Use(ErrorHandler)
     r.Use(AuthMiddleware)
+    r.Use(ErrorHandler)
 
     //r.Use(gzip.Gzip(gzip.DefaultCompression))
     //r.Use(CORSMiddleware())
     ca := handlers.CustomerApi{}
+    d := handlers.DeviceApi{}
 
     //r := gin.Default()
     v1 := r.Group("api/v1")
     {
         v1.POST("/events", handlers.HandleEvents)
 
-        v1.GET("/customers", ca.CampaignGet)
-        v1.POST("/customers", ca.CampaignPost)
+        v1.GET("/customers", ca.Get)
+        v1.POST("/customers", ca.Post)
+
+        v1.GET("/devices/:id", d.Get)
+        v1.POST("/devices", d.Post)
     }
     // customers
     // api-keys

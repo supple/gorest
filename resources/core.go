@@ -1,7 +1,6 @@
 package resources
 
 import (
-	"errors"
 	s "github.com/supple/gorest/storage"
     "unicode/utf8"
     "bytes"
@@ -9,18 +8,6 @@ import (
     "reflect"
     "fmt"
 )
-
-var (
-	ErrNotFound = errors.New("Object not found")
-)
-
-type ErrObjectNotFound struct {
-    object string
-    value string
-}
-func (e *ErrObjectNotFound) Error() string {
-    return fmt.Sprintf("Object not found: %s, value: %s", e.object, e.value)
-}
 
 const CUSTOMER_NAME_FIELD string = "customerName"
 

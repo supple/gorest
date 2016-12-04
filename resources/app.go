@@ -2,7 +2,7 @@ package resources
 
 import (
     "gopkg.in/mgo.v2/bson"
-    s "github.com/supple/gorest/storage"
+    "github.com/supple/gorest/storage"
     "github.com/supple/gorest/core"
 )
 
@@ -23,8 +23,8 @@ type AppRP struct {
 }
 
 func NewAppRP(cc *core.CustomerContext) *AppRP {
-    rp := &AppRP{cc:cc}
-    db := s.GetInstance(REPO_APP)
+    rp := &AppRP{cc: cc}
+    db := storage.GetInstance(REPO_APP)
     gt := core.NewGateway(rp.CollectionName(), cc, db)
     rp.gt = gt
     return rp
@@ -61,7 +61,7 @@ func (rp AppRP) CollectionName() string {
     return "App"
 }
 
-func CreateApp(db *s.MongoDB, cc *core.CustomerContext, os string, gcmToken string) (*App, error) {
+func CreateApp(cc *core.CustomerContext, os string, gcmToken string) (*App, error) {
     aRp := NewAppRP(cc)
 
     app := &App{}

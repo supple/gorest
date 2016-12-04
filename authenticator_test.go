@@ -128,7 +128,7 @@ func TestApiKey(t *testing.T) {
     model := &r.Customer{}
     model.Id = id
     model.CustomerName = customerName
-    err = cRp.Create(db, model)
+    err = cRp.Create(model)
     enil(err)
 
     // create api key

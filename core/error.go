@@ -3,17 +3,27 @@ package core
 import (
     "runtime"
     "log"
+    "fmt"
 )
 
+
+type ErrObjectNotFound struct {
+    Object string
+    Value  string
+}
+func (e *ErrObjectNotFound) Error() string {
+    return fmt.Sprintf("Object not found: %s, value: %s", e.Object, e.Value)
+}
+
 type APIErrors struct {
-    Errors      []*APIError `json:"errors"`
+    Errors      []*ApiError `json:"errors"`
 }
 
 func (ers *APIErrors) Status() int {
     return ers.Errors[0].Status
 }
 
-type APIError struct {
+type ApiError struct {
     Status  int         `json:"status"`
     Code    string      `json:"code"`
     Message string      `json:"title"`
@@ -21,21 +31,19 @@ type APIError struct {
     Href    string      `json:"href"`
 }
 
-func (e *APIError) Error() string {
+func (e *ApiError) Error() string {
     return e.Message
 }
 
 var (
-    ErrDatabase         = newAPIError(500, "database_error", "Database Error", "An unknown error occurred.", "")
-    ErrInvalidSet       = newAPIError(404, "invalid_set", "Invalid Set", "The set you requested does not exist.", "")
-    ErrInvalidGroup     = newAPIError(404, "invalid_group", "Invalid Group", "The group you requested does not exist.", "")
-    ErrUnknown     = newAPIError(500, "unknown_error", "Unknown error", "", "")
-    ErrInvalidApiKey     = newAPIError(401, "invalid_api_key", "Invalid api key", "", "")
-
+    ErrDatabase = NewAPIError(503, "database_error", "Database Error", "Temporary server error.", "")
+    Err404 = NewAPIError(404, "object_not_found", "Object not found", "Requested object not found.", "")
+    ErrUnknown = NewAPIError(500, "unknown_error", "Unknown error", "", "")
+    ErrInvalidApiKey = NewAPIError(401, "invalid_api_key", "Invalid api key", "", "")
 )
 
-func newAPIError(status int, code string, message string, details string, href string) *APIError {
-    return &APIError{
+func NewAPIError(status int, code string, message string, details string, href string) *ApiError {
+    return &ApiError{
         Status:     status,
         Code:       code,
         Message:      message,
@@ -53,16 +61,16 @@ func ErrorMessage(err error, error interface{}) (int, *APIErrors) {
     log.Printf("ERROR: %s\n%s", err, trace)
 
     switch error.(type) {
-    case *APIError:
-        apiError := error.(*APIError)
+    case *ApiError:
+        apiError := error.(*ApiError)
         apiErrors = &APIErrors{
-            Errors: []*APIError{apiError},
+            Errors: []*ApiError{apiError},
         }
     case *APIErrors:
         apiErrors = error.(*APIErrors)
     default:
         apiErrors = &APIErrors{
-            Errors: []*APIError{ErrUnknown},
+            Errors: []*ApiError{ErrUnknown},
         }
     }
     return apiErrors.Status(), apiErrors

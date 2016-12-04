@@ -3,7 +3,7 @@ package resources
 import (
     "gopkg.in/mgo.v2/bson"
     "github.com/supple/gorest/core"
-    s "github.com/supple/gorest/storage"
+    "github.com/supple/gorest/storage"
 )
 
 const REPO_DEVICE = "crm"
@@ -24,7 +24,7 @@ type DeviceRP struct {
 
 func NewDeviceRP(cc *core.CustomerContext) *DeviceRP {
     rp := &DeviceRP{cc: cc}
-    db := s.GetInstance(REPO_DEVICE)
+    db := storage.GetInstance(REPO_DEVICE)
     gt := core.NewGateway(rp.CollectionName(), cc, db)
     rp.gt = gt
 
@@ -42,6 +42,7 @@ func (rp *DeviceRP) Create(model *Device) error {
 
 func (rp *DeviceRP) Update(id string, model *map[string]interface{}) error {
     err := rp.gt.Update(id, model)
+
     return err
 }
 
@@ -63,19 +64,18 @@ func (rp *DeviceRP) Delete(id string) (error) {
     return err
 }
 
-
 func (rp *DeviceRP) ConstraintsValidation(model *Device) (error) {
     var err error
     csRp := NewCustomerRP(rp.cc)
     _, err = csRp.FindOneByName(model.CustomerName)
     if (err != nil) {
-        return &ErrObjectNotFound{"Customer", model.CustomerName}
+        return err
     }
 
     appRp := NewAppRP(rp.cc)
     _, err = appRp.FindOne(model.AppId)
     if (err != nil) {
-        return &ErrObjectNotFound{"App", model.AppId}
+        return err
     }
 
     return err
