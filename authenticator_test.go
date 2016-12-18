@@ -100,7 +100,7 @@ func TestApiKey(t *testing.T) {
     // init useful variables
     var id = "67158007-b5ff-495f-83bf-36867429a731"
     var customerName = "milapp"
-    var db = s.GetInstance("entities")
+    var db = s.GetInstance("crm")
 
     var cc *core.CustomerContext = &core.CustomerContext{CustomerName: customerName}
 

@@ -66,7 +66,7 @@ func (api *DeviceApi) Get(c *gin.Context) {
 }
 
 func (api *DeviceApi) Post(c *gin.Context) {
-    obj := resources.Customer{}
+    obj := resources.Device{}
     decoder := json.NewDecoder(c.Request.Body)
     if err := decoder.Decode(&obj); err != nil {
         log.Print(err.Error())

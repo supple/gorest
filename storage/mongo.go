@@ -21,7 +21,10 @@ func SetInstance(name string, db *MongoDB) {
 }
 
 func GetInstance(name string) *MongoDB {
-	return instances[name]
+    if val, ok := instances[name]; ok {
+        return val
+    }
+	panic(fmt.Sprintf("Database `%s` not defined", name))
 }
 
 func NewMongoDB(url string, dbName string) *MongoDB {
