@@ -20,7 +20,7 @@ import (
 //    var customerName = "customer_test"
 //    var at = r.AccessTo{Resource:"device", Action: "create"}
 
-//    var db = s.GetInstance("entities")
+//    var db = s.GetInstance("crm")
 //
 //    var cc *core.CustomerContext = &core.CustomerContext{CustomerName: customerName}
 //
@@ -92,7 +92,6 @@ import (
 //    enil(err)
 //}
 
-
 func TestApiKey(t *testing.T) {
     //
     var err error
@@ -107,7 +106,6 @@ func TestApiKey(t *testing.T) {
     cRp := r.NewCustomerRP(cc)
     akRp := r.NewApiKeyRP(cc)
 
-
     // helper function, error should be nil if not print it
     enil := func(value interface{}) {
         a.True(t, value == nil)
@@ -119,10 +117,8 @@ func TestApiKey(t *testing.T) {
     // set up db
     err = cRp.Install(db)
     enil(err)
-
     err = akRp.Install(db)
     enil(err)
-
 
     // save customer
     model := &r.Customer{}

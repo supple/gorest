@@ -73,7 +73,6 @@ func InitCache(app *core.AppServices) {
 func init() {
     // Init storage instances
     storage.SetInstance("crm", storage.NewMongoDB("192.168.1.106:27017", "crm"))
-    //storage.SetInstance("entities", storage.NewMongoDB("192.168.1.106:27017", "entities"))
     storage.SetInstance("events", storage.NewMongoDB("192.168.1.106:27017", "events"))
 
     // Create the job queue.

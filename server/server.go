@@ -22,8 +22,6 @@ func AuthMiddleware(c *gin.Context) {
     }
 
     // handle error
-    //log.Print()
-
     switch err.(type) {
     case *core.ApiError:
         ae := err.(*core.ApiError)
@@ -53,9 +51,10 @@ func SetupRouter() *gin.Engine {
     //r.Use(gzip.Gzip(gzip.DefaultCompression))
     //r.Use(CORSMiddleware())
     r.Use(gin.Recovery())
+    r.Use(ErrorHandler)
     r.Use(gin.Logger())
     r.Use(AuthMiddleware)
-    r.Use(ErrorHandler)
+
 
     // api handlers
     ca := handlers.CustomerApi{}

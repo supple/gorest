@@ -93,8 +93,12 @@ func Auth(apiKey string, accessTo AccessTo) (*core.CustomerContext, error) {
     akRp := NewApiKeyRP(cc)
     ak, err := akRp.FindOneBy(bson.M{API_KEY_FIELD: apiKey})
     // @todo: hasAccess(accessTo)
-    if err == mgo.ErrNotFound {
+    if err == core.ErrNotFound {
         return nil, core.ErrInvalidApiKey
+    }
+
+    if (err != nil) {
+        return nil, err
     }
 
     if (ak != nil) {

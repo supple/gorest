@@ -34,10 +34,13 @@ func NewCustomerRP(cc *core.CustomerContext) *CustomerRP {
 func (rp *CustomerRP) Create(model *Customer) error {
     _, err := rp.FindOneByName(model.CustomerName)
     if (err != nil) {
-        _, ok := err.(*core.ErrObjectNotFound)
-        if (!ok) {
+        if (err != core.ErrNotFound) {
             return err
         }
+        //_, ok := err.(*core.ErrObjectNotFound)
+        //if (!ok) {
+        //    return err
+        //}
 
         model.Hash = lc.RandString(8)
         return rp.gt.Insert(model)

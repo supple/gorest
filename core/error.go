@@ -37,7 +37,7 @@ func (e *ApiError) Error() string {
 
 var (
     ErrDatabase = NewAPIError(503, "database_error", "Database Error", "Temporary server error.", "")
-    Err404 = NewAPIError(404, "object_not_found", "Object not found", "Requested object not found.", "")
+    ErrNotFound = NewAPIError(404, "object_not_found", "Object not found", "Requested object not found.", "")
     ErrUnknown = NewAPIError(500, "unknown_error", "Unknown error", "", "")
     ErrInvalidApiKey = NewAPIError(401, "invalid_api_key", "Invalid api key", "", "")
 )

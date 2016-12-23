@@ -37,19 +37,25 @@ import (
 
 func init() {
     // Init storage instances
-    storage.SetInstance("crm", storage.NewMongoDB("192.168.1.106:27017", "crm"))
+    storage.SetInstance("crm", storage.NewMongoDB("192.168.1.106:27017", "test"))
+}
+
+func createApiKey() {
+
 }
 
 // router_test.go
-func TestDeviceRP_Update(t *testing.T) {
+func TestDeviceHandler_Update(t *testing.T) {
     testRouter := SetupRouter()
 
     req, err := http.NewRequest("GET", "/devices/1", nil)
+    req.Header.Add("API-KEY", "OiBTGDVxmZnZHAITDMjqyQRJ-cElsforb")
     if err != nil {
-        fmt.Println(err)
+        fmt.Println("x")
     }
 
     resp := httptest.NewRecorder()
     testRouter.ServeHTTP(resp, req)
-    a.Equal(t, 200, resp.Code)
+    //a.Equal(t, 200, resp.Code)
+    a.Equal(t, "ok", resp.Body.String())
 }

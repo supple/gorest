@@ -80,8 +80,9 @@ func (gt *Gateway) toApiError(err error) error {
         return ErrDatabase
     }
     if (err == mgo.ErrNotFound) {
-        //return Err404
-        return &ErrObjectNotFound{gt.collectionName, ""}
+        //return mgo.ErrNotFound
+        return ErrNotFound
+        //return &ErrObjectNotFound{gt.collectionName, ""}
     }
 
     return nil
