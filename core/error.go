@@ -26,9 +26,7 @@ func (ers *APIErrors) Status() int {
 type ApiError struct {
     Status  int         `json:"status"`
     Code    string      `json:"code"`
-    Message string      `json:"title"`
-    Details string      `json:"details"`
-    Href    string      `json:"href"`
+    Message string      `json:"message"`
 }
 
 func (e *ApiError) Error() string {
@@ -36,19 +34,21 @@ func (e *ApiError) Error() string {
 }
 
 var (
-    ErrDatabase = NewAPIError(503, "database_error", "Database Error", "Temporary server error.", "")
-    ErrNotFound = NewAPIError(404, "object_not_found", "Object not found", "Requested object not found.", "")
-    ErrUnknown = NewAPIError(500, "unknown_error", "Unknown error", "", "")
-    ErrInvalidApiKey = NewAPIError(401, "invalid_api_key", "Invalid api key", "", "")
+    ErrDatabase = NewAPIError(503, "database_error", "Database Error")
+    ErrNotFound = NewAPIError(404, "object_not_found", "Object not found")
+    ErrUnknown = NewAPIError(500, "unknown_error", "Unknown error")
+    ErrInvalidApiKey = NewAPIError(401, "invalid_api_key", "Invalid api key")
 )
 
-func NewAPIError(status int, code string, message string, details string, href string) *ApiError {
+func ErrorFrom(e *ApiError, message string) *ApiError {
+    return NewAPIError(e.Status, e.Code, message)
+}
+
+func NewAPIError(status int, code string, message string) *ApiError {
     return &ApiError{
         Status:     status,
         Code:       code,
-        Message:      message,
-        Details:    details,
-        Href:       href,
+        Message:    message,
     }
 }
 

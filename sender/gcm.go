@@ -30,7 +30,7 @@ type Client struct {
 }
 
 func NewClient(timeout int32) *Client {
-    var cl *http.Client = &http.Client{Timeout: time.Second * timeout}
+    var cl *http.Client = &http.Client{Timeout: time.Second * time.Duration(timeout)}
     return &Client{cl: cl}
 }
 

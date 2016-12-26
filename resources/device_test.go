@@ -51,7 +51,7 @@ func TestDeviceRP_Create(t *testing.T) {
     d.AppId = "xo"
     d.CustomerName = cn
     err = dRp.Create(d)
-    a.Equal(t, err, (&core.ErrObjectNotFound{"Customer", ""}), "#1")
+    a.Equal(t, core.ErrorFrom(core.ErrNotFound, "Customer not found"), err, "#1")
 
     // create customer
     customer, err := CreateCustomer(cn)
@@ -61,7 +61,7 @@ func TestDeviceRP_Create(t *testing.T) {
 
     // create device on non existing app
     err = dRp.Create(d)
-    a.Equal(t, err, (&core.ErrObjectNotFound{"App", ""}), "#3")
+    a.Equal(t, core.ErrorFrom(core.ErrNotFound, "App id not set in api key"), err, "#3")
 
     // create app and device
     app, err := CreateApp(cc, "android", "_")

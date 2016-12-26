@@ -25,7 +25,8 @@ type DeviceRP struct {
 func NewDeviceRP(cc *core.CustomerContext) *DeviceRP {
     rp := &DeviceRP{cc: cc}
     db := storage.GetInstance(REPO_DEVICE)
-    gt := core.NewGateway(rp.CollectionName(), cc, db)
+    d := core.ContextDecorator(cc)
+    gt := core.NewGateway(rp.CollectionName(), d, db)
     rp.gt = gt
 
     return rp
@@ -68,12 +69,20 @@ func (rp *DeviceRP) ConstraintsValidation(model *Device) (error) {
     var err error
     csRp := NewCustomerRP(rp.cc)
     _, err = csRp.FindOneByName(model.CustomerName)
+    if err == core.ErrNotFound {
+        // core.NewValidationError("customer", "Customer not found: ")
+        return core.ErrorFrom(core.ErrNotFound,  "Customer not found")
+    }
     if (err != nil) {
         return err
     }
 
     appRp := NewAppRP(rp.cc)
     _, err = appRp.FindOne(model.AppId)
+    if err == core.ErrNotFound {
+        // app_id, App id not set in api key
+        return core.ErrorFrom(core.ErrNotFound,  "App id not set in api key")
+    }
     if (err != nil) {
         return err
     }

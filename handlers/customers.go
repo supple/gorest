@@ -42,11 +42,7 @@ func handleError(err error, c *gin.Context) bool {
 
 //
 func (api *DeviceApi) Get(c *gin.Context) {
-    var cc *core.CustomerContext
-    ccc, _ := c.Get("cc")
-    cc = ccc.(*core.CustomerContext)
-
-    // *core.CustomerContext
+    var cc = core.GetCC(c)
     rp := resources.NewDeviceRP(cc)
     id := c.Param("id")
     //var content Content
@@ -66,12 +62,18 @@ func (api *DeviceApi) Get(c *gin.Context) {
 }
 
 func (api *DeviceApi) Post(c *gin.Context) {
-    obj := resources.Device{}
+    var err error
+    obj := &resources.Device{}
+
     decoder := json.NewDecoder(c.Request.Body)
-    if err := decoder.Decode(&obj); err != nil {
+    if err = decoder.Decode(obj); err != nil {
         log.Print(err.Error())
         c.JSON(422, err)
-        //http.Error(w, http.StatusText(422), 422)
+        return
+    }
+    dRp := resources.NewDeviceRP(core.GetCC(c))
+    err = dRp.Create(obj)
+    if (handleError(err, c)) {
         return
     }
     c.JSON(201, obj)

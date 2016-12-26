@@ -2,6 +2,7 @@ package core
 import (
     "github.com/supple/gorest/storage"
     "fmt"
+    "github.com/gin-gonic/gin"
 )
 
 type AppServices struct {
@@ -22,4 +23,12 @@ type CustomerContext struct {
     AppId string
     DeviceId string
     CustomerName string
+}
+
+func GetCC(c *gin.Context) *CustomerContext {
+    cc, ok := c.Get("cc")
+    if ok {
+        return cc.(*CustomerContext)
+    }
+    panic("Customer context not set")
 }

@@ -5,7 +5,6 @@ import (
     "github.com/supple/gorest/handlers"
     "github.com/supple/gorest/resources"
     "github.com/supple/gorest/core"
-
 )
 
 
@@ -16,6 +15,8 @@ func AuthMiddleware(c *gin.Context) {
     cc, err := resources.Auth(c.Request.Header.Get("API-KEY"), ac)
 
     if err == nil {
+        core.Log(cc.CustomerName)
+        core.Log(cc.ApiKey)
         c.Set("cc", cc)
         c.Next()
         return

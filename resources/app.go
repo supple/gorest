@@ -25,7 +25,8 @@ type AppRP struct {
 func NewAppRP(cc *core.CustomerContext) *AppRP {
     rp := &AppRP{cc: cc}
     db := storage.GetInstance(REPO_APP)
-    gt := core.NewGateway(rp.CollectionName(), cc, db)
+    d := core.ContextDecorator(cc)
+    gt := core.NewGateway(rp.CollectionName(), d, db)
     rp.gt = gt
     return rp
 }

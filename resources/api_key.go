@@ -29,7 +29,9 @@ type ApiKeyRP struct {
 func NewApiKeyRP(cc *core.CustomerContext) *ApiKeyRP {
     rp := &ApiKeyRP{cc:cc}
     db := s.GetInstance(API_KEY_REPO)
-    gt := core.NewGateway(rp.CollectionName(), cc, db)
+    d := core.EmptyDecorator()
+    gt := core.NewGateway(rp.CollectionName(), d, db)
+
     rp.gt = gt
 
     return rp
@@ -63,7 +65,7 @@ func (rp *ApiKeyRP) FindOne(id string) (*ApiKey, error) {
 
 func (rp *ApiKeyRP) FindOneBy(conditions bson.M) (*ApiKey, error) {
     result := &ApiKey{}
-    err := rp.gt.FindOneWithoutContextBy(conditions, result)
+    err := rp.gt.FindOneBy(conditions, result)
 
     return result, err
 }

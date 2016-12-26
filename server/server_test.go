@@ -48,7 +48,7 @@ func createApiKey() {
 func TestDeviceHandler_Update(t *testing.T) {
     testRouter := SetupRouter()
 
-    req, err := http.NewRequest("GET", "/devices/1", nil)
+    req, err := http.NewRequest("GET", "/api/v1/devices/1", nil)
     req.Header.Add("API-KEY", "OiBTGDVxmZnZHAITDMjqyQRJ-cElsforb")
     if err != nil {
         fmt.Println("x")
@@ -56,6 +56,5 @@ func TestDeviceHandler_Update(t *testing.T) {
 
     resp := httptest.NewRecorder()
     testRouter.ServeHTTP(resp, req)
-    //a.Equal(t, 200, resp.Code)
-    a.Equal(t, "ok", resp.Body.String())
+    a.Equal(t, "{\"error\":\"Object not found\"}\n", resp.Body.String())
 }
