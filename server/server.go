@@ -60,6 +60,7 @@ func SetupRouter() *gin.Engine {
     // api handlers
     ca := handlers.CustomerApi{}
     d := handlers.DeviceApi{}
+    apps := handlers.AppApi{}
 
     v1 := r.Group("api/v1")
     {
@@ -70,6 +71,12 @@ func SetupRouter() *gin.Engine {
 
         v1.GET("/devices/:id", d.Get)
         v1.POST("/devices", d.Post)
+        v1.PATCH("/devices", d.Patch)
+
+        v1.POST("/apps", apps.Create)
+        v1.GET("/apps/:id", apps.Get)
+
+        v1.GET("/apps", apps.List)
     }
     // customers
     // api-keys

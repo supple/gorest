@@ -4,15 +4,23 @@ import (
     "gopkg.in/mgo.v2/bson"
     "github.com/supple/gorest/core"
     "github.com/supple/gorest/storage"
+    "encoding/json"
+    "io"
 )
 
 const REPO_DEVICE = "crm"
+
+// --- ## Device model
 
 type Device struct {
     CustomerBased `bson:",inline"`
     AppId      string        `json:"appId" bson:"appId" `
     AppToken   string        `json:"appToken" bson:"appToken"`
     AppVersion string         `json:"appVersion" bson:"appVersion"`
+}
+
+func (d *Device) IsValidForUpdate() {
+
 }
 
 // --- ## Device repository
@@ -33,10 +41,13 @@ func NewDeviceRP(cc *core.CustomerContext) *DeviceRP {
 }
 
 func (rp *DeviceRP) Create(model *Device) error {
+    model.CustomerName = rp.cc.CustomerName
+    model.AppId = rp.cc.AppId
     err := rp.ConstraintsValidation(model)
     if (err != nil) {
         return err
     }
+    model.SetBasicFields()
 
     return rp.gt.Insert(model)
 }
@@ -63,6 +74,18 @@ func (rp *DeviceRP) FindOneBy(conditions bson.M) (*Device, error) {
 func (rp *DeviceRP) Delete(id string) (error) {
     err := rp.gt.Remove(id)
     return err
+}
+
+func DeviceFromJson(data io.Reader) (*Device, error) {
+    obj := &Device{}
+    decoder := json.NewDecoder(data)
+    if err := decoder.Decode(obj); err != nil {
+        return nil, err
+    }
+
+    // validate
+
+    return obj, nil
 }
 
 func (rp *DeviceRP) ConstraintsValidation(model *Device) (error) {

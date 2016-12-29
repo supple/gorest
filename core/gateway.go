@@ -48,23 +48,30 @@ func (gt *Gateway) Insert(model interface{}) error {
         vDst.SetString(lc.NewId())
     }
 
-    err := gt.db.Coll(gt.collectionName).Insert(model)
+    coll := gt.db.Coll(gt.collectionName)
+    err := coll.Insert(model)
+    logQuery(coll, model)
     handleError(gt.db, err)
 
     return gt.toApiError(err)
 }
 
-func (gt *Gateway) Update(id string, model *map[string]interface{}) error {
+//func (gt *Gateway) Update(id string, model *map[string]interface{}) error {
+func (gt *Gateway) Update(id string, model interface{}) error {
     query := gt.decorate(bson.M{"_id": id})
-    err := gt.db.Coll(gt.collectionName).Update(query, model)
+    coll := gt.db.Coll(gt.collectionName)
+    err := coll.Update(query, model)
+    logQuery(coll, struct {query interface{} ; model interface{}} {query, model})
     handleError(gt.db, err)
 
     return gt.toApiError(err)
 }
 
 func (gt *Gateway) Remove(id string) error {
-    q := gt.decorate(bson.M{"_id": id})
-    err := gt.db.Coll(gt.collectionName).Remove(q)
+    query := gt.decorate(bson.M{"_id": id})
+    coll := gt.db.Coll(gt.collectionName)
+    err := coll.Remove(query)
+    logQuery(coll, query)
     handleError(gt.db, err)
 
     return gt.toApiError(err)

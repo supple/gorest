@@ -33,6 +33,7 @@ func RandString(n int) string {
 }
 
 func NewId() (string) {
+	return RandString(12)
 	id, _ := uuid.NewRandom()
 	return id.String()
 }
