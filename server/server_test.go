@@ -6,7 +6,7 @@ import (
     "fmt"
     "net/http/httptest"
     "net/http"
-    "github.com/supple/gorest/storage"
+    "github.com/supple/gorest/tests"
 )
 //
 //import (
@@ -37,21 +37,19 @@ import (
 
 func init() {
     // Init storage instances
-    storage.SetInstance("crm", storage.NewMongoDB("192.168.1.106:27017", "test"))
-}
-
-func createApiKey() {
-
+    tests.GetStorage()
+    tests.CreateTestCustomer()
 }
 
 // router_test.go
 func TestDeviceHandler_Update(t *testing.T) {
     testRouter := SetupRouter()
+    apiKey := tests.CreateTestApiKey()
 
     req, err := http.NewRequest("GET", "/api/v1/devices/1", nil)
-    req.Header.Add("API-KEY", "OiBTGDVxmZnZHAITDMjqyQRJ-cElsforb")
+    req.Header.Add("API-KEY", apiKey.ApiKey)
     if err != nil {
-        fmt.Println("x")
+        fmt.Println(err.Error())
     }
 
     resp := httptest.NewRecorder()

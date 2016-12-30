@@ -65,14 +65,12 @@ func MapFromJson(data io.Reader) (*map[string]interface{}, error) {
 
 
 // Update model properties from map
-func UpdateModel(c interface{}, data map[string]interface{}) {
+// Model has to be passed by ref
+func UpdateModel(model interface{}, data map[string]interface{}) {
     for k, v := range  data {
         // public field name in struct
         fieldName := ucfirst(k)
-
-        //vDst := reflect.ValueOf(c).Elem().FieldByName(fieldName)
-        vDst := reflect.Indirect(reflect.ValueOf(c)).FieldByName(fieldName)
-        //fmt.Printf("%s %b \n", fieldName, vDst.CanSet())
+        vDst := reflect.Indirect(reflect.ValueOf(model)).FieldByName(fieldName)
         if !vDst.CanSet() {
             continue
         }

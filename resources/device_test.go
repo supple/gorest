@@ -6,10 +6,12 @@ import (
     "github.com/supple/gorest/storage"
     a "github.com/stretchr/testify/assert"
     "fmt"
+    "github.com/supple/gorest/tests"
 )
 
 func init() {
-    storage.SetInstance("crm", storage.NewMongoDB("192.168.1.106:27017", "crm_test"))
+    // Init storage instances
+    tests.GetStorage()
 }
 
 func TestDeviceRP_Update(t *testing.T) {
@@ -31,16 +33,10 @@ func TestDeviceRP_Update(t *testing.T) {
 
 func TestDeviceRP_Create(t *testing.T) {
     var err error
-    var cn = "customer_test"
-    cc := &core.CustomerContext{CustomerName:cn}
-
-    db := storage.GetInstance("crm")
-    storage.DropDatabase(db)
+    var cn = tests.TEST_CUSTOMER
+    cc := &core.CustomerContext{CustomerName: tests.TEST_CUSTOMER}
 
     dRp := NewDeviceRP(cc)
-
-    // prepare, drop device collection
-    storage.DropCollection(db, dRp.CollectionName())
 
     // create device on non existing customer
     d := &Device{}
@@ -50,18 +46,19 @@ func TestDeviceRP_Create(t *testing.T) {
     a.Equal(t, core.ErrorFrom(core.ErrNotFound, "Customer not found"), err, "#1")
 
     // create customer
-    customer, err := CreateCustomer(cn)
-    fmt.Println(customer)
-    a.Equal(t, nil, err)
-    a.Equal(t, customer.CustomerName, "customer_test", "#2")
+    tests.CreateTestCustomer()
 
     // create device on non existing app
     err = dRp.Create(d)
     a.Equal(t, core.ErrorFrom(core.ErrNotFound, "App id not set in api key"), err, "#3")
 
     // create app and device
-    app, err := CreateAndroidApp(cc, "")
+    app, err := CreateAndroidApp(cc, "", "")
+    cc.AppId = app.Id
     d.AppId = app.Id
     err = dRp.Create(d)
+    if (err != nil) {
+        fmt.Println(err.Error())
+    }
     a.True(t, err == nil)
 }

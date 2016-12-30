@@ -6,9 +6,6 @@ import (
     "github.com/supple/gorest/core"
     "io"
     "encoding/json"
-    "reflect"
-    "fmt"
-    "strings"
 )
 
 const REPO_APP = "crm"
@@ -23,38 +20,6 @@ type App struct {
     ApnsKeyId string `json:"apnsKeyId" bson:"apnsKeyId"`
 }
 
-func fieldSet(fields ...string) map[string]bool {
-    set := make(map[string]bool, len(fields))
-    for _, s := range fields {
-        set[s] = true
-    }
-    return set
-}
-
-func SelectFields(s interface{}, fields ...string) map[string]interface{} {
-    fs := fieldSet(fields...)
-    rt := reflect.TypeOf(s)
-    rv :=  reflect.ValueOf(s)
-    out := make(map[string]interface{})
-    for i := 0; i < rt.NumField(); i++ {
-        field := rt.Field(i)
-        if (field.Type.Kind() == reflect.Struct) {
-            sub := SelectFields(rv.Field(i).Interface(), fields...)
-            for k, v := range sub {
-                out[k] = v
-            }
-        }
-
-        jsonKey := field.Tag.Get("json")
-        jsonKey = strings.Split(jsonKey, ",")[0]
-        fmt.Println(field.Name, field.Type.Kind(), jsonKey)
-        if fs[jsonKey] {
-            out[jsonKey] = rv.Field(i).Interface()
-        }
-    }
-
-    return out
-}
 
 // ### -- App repository
 
@@ -148,7 +113,7 @@ type ValidationError struct {
     Message string `json:"message"`
 }
 
-func (er *ValidationError) ToJson() string {
+func (er ValidationError) Error() string {
     b, err := json.Marshal(er)
     if err != nil {
         return ""
@@ -197,10 +162,11 @@ func ValidateApp(m *App) []*ValidationError {
 //    return errors
 //}
 
-func CreateAndroidApp(cc *core.CustomerContext, gcmToken string) (*App, error) {
+func CreateAndroidApp(cc *core.CustomerContext, gcmToken string, id string) (*App, error) {
     aRp := NewAppRP(cc)
 
     app := &App{}
+    app.Id = id
     app.GcmToken = gcmToken
     app.Os = OS_ANDRIOD
 

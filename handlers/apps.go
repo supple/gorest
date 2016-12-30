@@ -14,13 +14,19 @@ func (api *AppApi) Get(c *gin.Context) {
     var cc = core.GetCC(c)
     rp := resources.NewAppRP(cc)
     id := c.Param("id")
-
+    core.Log(id, "xo")
     ret, err := rp.FindOne(id)
     if (handleError(err, c)) {
         return
     }
 
-    c.JSON(200, resources.SelectFields(*ret, "name", "id", "createdAt"))
+    if (c.Query("fields") == "all") {
+        c.JSON(200, ret)
+        return
+    }
+
+    fields := []string{"id", "name", "createdAt", "updatedAt"}
+    c.JSON(200, core.PartialStruct(*ret, fields...))
 }
 
 func (api *AppApi) Create(c *gin.Context) {

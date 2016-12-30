@@ -78,6 +78,9 @@ func (rp *ApiKeyRP) Delete(id string) (error) {
 func (rp *ApiKeyRP) ConstraintsValidation(model *ApiKey) (*Customer, error) {
     csRp := NewCustomerRP(rp.cc)
     c, err := csRp.FindOneByName(model.CustomerName)
+    if (err == core.ErrNotFound) {
+        return nil, ValidationError{Field: "customerName", Message: "Customer not found: "+model.CustomerName}
+    }
     if (err != nil) {
         return nil, err
     }

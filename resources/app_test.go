@@ -9,7 +9,10 @@ import (
 )
 
 func init() {
-    storage.SetInstance("crm", storage.NewMongoDB("192.168.1.106:27017", "crm_test"))
+    // Init storage instances
+    db := storage.NewMongoDB("192.168.1.106:27017", "unittest")
+    storage.SetInstance("crm", db)
+    storage.DropDatabase(db)
 }
 
 func TestAppRP_Update(t *testing.T) {
@@ -57,7 +60,7 @@ func TestAppRP_Create(t *testing.T) {
     a.Equal(t, customer.CustomerName, cn, "#2")
 
     // create app and device
-    appNew, err := CreateAndroidApp(cc, "")
+    appNew, err := CreateAndroidApp(cc, "", "")
     a.True(t, err == nil)
     a.Equal(t, appNew.Os, OS_ANDRIOD)
 }
