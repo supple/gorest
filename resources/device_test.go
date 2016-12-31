@@ -3,15 +3,13 @@ package resources
 import (
     "testing"
     "github.com/supple/gorest/core"
-    "github.com/supple/gorest/storage"
-    a "github.com/stretchr/testify/assert"
-    "fmt"
+    "github.com/stretchr/testify/assert"
     "github.com/supple/gorest/tests"
 )
 
 func init() {
     // Init storage instances
-    tests.GetStorage()
+    tests.GetTestStorage()
 }
 
 func TestDeviceRP_Update(t *testing.T) {
@@ -43,14 +41,14 @@ func TestDeviceRP_Create(t *testing.T) {
     d.AppId = "xo"
     d.CustomerName = cn
     err = dRp.Create(d)
-    a.Equal(t, core.ErrorFrom(core.ErrNotFound, "Customer not found"), err, "#1")
+    assert.Equal(t, core.ErrorFrom(core.ErrNotFound, "Customer not found"), err, "#1")
 
     // create customer
-    tests.CreateTestCustomer()
+    CreateCustomer(tests.TEST_CUSTOMER)
 
     // create device on non existing app
     err = dRp.Create(d)
-    a.Equal(t, core.ErrorFrom(core.ErrNotFound, "App id not set in api key"), err, "#3")
+    assert.Equal(t, core.ErrorFrom(core.ErrNotFound, "App id not set in api key"), err, "#3")
 
     // create app and device
     app, err := CreateAndroidApp(cc, "", "")
@@ -58,7 +56,7 @@ func TestDeviceRP_Create(t *testing.T) {
     d.AppId = app.Id
     err = dRp.Create(d)
     if (err != nil) {
-        fmt.Println(err.Error())
+        core.Log(err.Error())
     }
-    a.True(t, err == nil)
+    assert.True(t, err == nil)
 }

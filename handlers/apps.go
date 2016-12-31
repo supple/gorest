@@ -14,7 +14,6 @@ func (api *AppApi) Get(c *gin.Context) {
     var cc = core.GetCC(c)
     rp := resources.NewAppRP(cc)
     id := c.Param("id")
-    core.Log(id, "xo")
     ret, err := rp.FindOne(id)
     if (handleError(err, c)) {
         return

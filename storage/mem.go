@@ -52,12 +52,12 @@ func (ca* MemStorage) Update(id string,obj interface{}) {
 }
 
 // Get object names with ids
-func (ca* MemStorage) GetByCriteria() []interface{} {
-    var names []interface{}
-    ca.mu.RLock()
-    for _, obj := range ca.objects {
-        names = append(names, obj)
-    }
-    ca.mu.RUnlock()
-    return names
-}
+//func (ca* MemStorage) GetByCriteria() []interface{} {
+//    var names []interface{}
+//    ca.mu.RLock()
+//    for _, obj := range ca.objects {
+//        names = append(names, obj)
+//    }
+//    ca.mu.RUnlock()
+//    return names
+//}

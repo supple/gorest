@@ -55,7 +55,7 @@ func (rp *AppRP) Create(model *App) error {
 //}
 
 func (rp *AppRP) Update(id string, model *App) error {
-    model.UpdatedAt = GetJodaTime()
+    model.UpdatedAt = core.GetJodaTime()
     err := rp.gt.Update(id, model)
     return err
 }

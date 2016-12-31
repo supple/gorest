@@ -14,8 +14,8 @@ import (
 
 func init() {
     // Init storage instances
-    tests.GetStorage()
-    tests.CreateTestCustomer()
+    tests.GetTestStorage()
+    resources.CreateCustomer(tests.TEST_CUSTOMER)
 }
 
 func TestAppApi_Get(t *testing.T) {

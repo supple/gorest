@@ -1,7 +1,8 @@
 package resources
 
 import (
-	s "github.com/supple/gorest/storage"
+	"github.com/supple/gorest/storage"
+    "github.com/supple/gorest/core"
     "unicode/utf8"
     "bytes"
     "unicode"
@@ -9,7 +10,6 @@ import (
     "fmt"
     "io"
     "encoding/json"
-    "time"
 )
 
 const CUSTOMER_NAME_FIELD string = "customerName"
@@ -19,6 +19,7 @@ const (
     OS_IOS = "ios"
 )
 
+// Customer based object
 type CustomerBased struct {
     Id           string `json:"id,omitempty" bson:"_id"`
     CustomerName string `json:"customerName" bson:"customerName,omitempty" validate:"required"`
@@ -27,23 +28,26 @@ type CustomerBased struct {
     DeletedAt    string  `json:"deletedAt,omitempty" bson:"deletedAt,omitempty"`
 }
 
+// Set values on common model fields
 func (model *CustomerBased) SetBasicFields() {
-    model.CreatedAt = GetJodaTime()
+    model.CreatedAt = core.GetJodaTime()
     model.UpdatedAt = model.CreatedAt
 }
 
 type Repository interface {
-	Create(db *s.MongoDB, model interface{}) (error)
-	Update(db *s.MongoDB, id string, model interface{})
+	Create(db *storage.MongoDB, model interface{}) (error)
+	Update(db *storage.MongoDB, id string, model interface{})
 	FindOne(id string) (interface{}, error)
 	CollectionName() string
 }
 
+// ACL object
 type AccessTo struct {
     Resource string
     Action string
 }
 
+// Make first letter capital
 func ucfirst(s string) string {
     r, size := utf8.DecodeRuneInString(s)
     buf := &bytes.Buffer{}
@@ -52,7 +56,7 @@ func ucfirst(s string) string {
     return buf.String()
 }
 
-
+// Create map from json string
 func MapFromJson(data io.Reader) (*map[string]interface{}, error) {
     obj := make(map[string]interface{})
     decoder := json.NewDecoder(data)
@@ -63,9 +67,8 @@ func MapFromJson(data io.Reader) (*map[string]interface{}, error) {
     return &obj, nil
 }
 
-
 // Update model properties from map
-// Model has to be passed by ref
+// Struct has to be passed by ref
 func UpdateModel(model interface{}, data map[string]interface{}) {
     for k, v := range  data {
         // public field name in struct
@@ -84,8 +87,4 @@ func UpdateModel(model interface{}, data map[string]interface{}) {
             vDst.Set(vSrc)
         }
     }
-}
-
-func GetJodaTime() string {
-    return time.Now().Format("2006-01-02T15:04:05.999Z")
 }

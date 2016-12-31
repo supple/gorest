@@ -1,12 +1,18 @@
 package core
+
 import (
-    "github.com/supple/gorest/storage"
-    "fmt"
     "github.com/gin-gonic/gin"
+    "fmt"
 )
 
+type Storage interface {
+    Get(id string) interface{}
+    Set(id string, obj interface{}) bool
+    Update(id string,obj interface{})
+}
+
 type AppServices struct {
-    Storage *storage.MemStorage
+    Storage Storage
 }
 
 type AppError struct {
