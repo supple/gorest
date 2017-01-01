@@ -70,7 +70,7 @@ func InitCache(app *core.AppServices) {
 //    jsonResponse(w, obj)
 //}
 
-func init() {
+func initServices() {
     // Init storage instances
     storage.SetInstance("crm", storage.NewMongoDB("192.168.1.106:27017", "crm"))
     storage.SetInstance("events", storage.NewMongoDB("192.168.1.106:27017", "events"))
@@ -112,6 +112,8 @@ func CORSMiddleware() gin.HandlerFunc {
 }
 
 func main() {
+    initServices()
+
     fmt.Println("v1.0.0")
     InitCache(&app)
 

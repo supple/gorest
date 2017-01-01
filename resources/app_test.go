@@ -6,13 +6,12 @@ import (
     "github.com/supple/gorest/storage"
     a "github.com/stretchr/testify/assert"
     "fmt"
+    "github.com/supple/gorest/tests"
 )
 
 func init() {
     // Init storage instances
-    db := storage.NewMongoDB("192.168.1.106:27017", "unittest")
-    storage.SetInstance("crm", db)
-    storage.DropDatabase(db)
+    tests.GetTestStorage()
 }
 
 func TestAppRP_Update(t *testing.T) {

@@ -1,8 +1,16 @@
- dependencies:
-  cache_directories:
-    - mongodb-linux-x86_64-ubuntu1204-3.2.0
+dependencies:
   pre:
-    - if [[ ! -d mongodb-linux-x86_64-ubuntu1204-3.2.0 ]]; then wget http://fastdl.mongodb.org/linux/mongodb-linux-x86_64-ubuntu1204-3.2.0.tgz && tar xvzf mongodb-linux-x86_64-ubuntu1204-3.2.0.tgz; fi
-    - sudo stop mongodb
-    - sudo cp mongodb-linux-x86_64-ubuntu1204-3.2.0/bin/* /usr/bin
-    - sudo start mongodb
+    - sudo apt-get purge mongodb-org*
+    - sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 7F0CEB10
+    - echo "deb http://repo.mongodb.org/apt/ubuntu precise/mongodb-org/3.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-3.0.list
+    - sudo apt-get update
+    - sudo apt-get install -y mongodb-org
+    - sudo service mongod restart
+  override:
+    - go get -u github.com/govend/govend
+    - go get -t -d -v ./...
+    - cd ${HOME}/.go_workspace/src/github.com/supple/gorest && govend
+
+test:
+  override:
+    - cd ${HOME}/.go_workspace/src/github.com/supple/gorest && go test -v -race $(go list ./... | grep -v /vendor/)

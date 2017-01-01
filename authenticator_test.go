@@ -1,13 +1,13 @@
 package main
 
-import (
-    "testing"
-    a "github.com/stretchr/testify/assert"
-    "github.com/supple/gorest/core"
-    s "github.com/supple/gorest/storage"
-    r "github.com/supple/gorest/resources"
-    "fmt"
-)
+//import (
+//    "testing"
+//    a "github.com/stretchr/testify/assert"
+//    "github.com/supple/gorest/core"
+//    s "github.com/supple/gorest/storage"
+//    r "github.com/supple/gorest/resources"
+//    "fmt"
+//)
 //
 //func TestFlow(t *testing.T) {
 //    //
@@ -92,45 +92,45 @@ import (
 //    enil(err)
 //}
 
-func TestApiKey(t *testing.T) {
-    //
-    var err error
-
-    // init useful variables
-    var id = "67158007-b5ff-495f-83bf-36867429a731"
-    var customerName = "milapp"
-    var db = s.GetInstance("crm")
-
-    var cc *core.CustomerContext = &core.CustomerContext{CustomerName: customerName}
-
-    cRp := r.NewCustomerRP(cc)
-    akRp := r.NewApiKeyRP(cc)
-
-    // helper function, error should be nil if not print it
-    enil := func(value interface{}) {
-        a.True(t, value == nil)
-        if (value != nil) {
-            fmt.Println(value)
-        }
-    }
-
-    // set up db
-    err = cRp.Install(db)
-    enil(err)
-    err = akRp.Install(db)
-    enil(err)
-
-    // save customer
-    model := &r.Customer{}
-    model.Id = id
-    model.CustomerName = customerName
-    err = cRp.Create(model)
-    enil(err)
-
-    // create api key
-    ak := &r.ApiKey{}
-    ak.CustomerName = model.CustomerName
-    err = akRp.Create(ak)
-
-    fmt.Println(ak.ApiKey)
-}
+//func TestApiKey(t *testing.T) {
+//    //
+//    var err error
+//
+//    // init useful variables
+//    var id = "67158007-b5ff-495f-83bf-36867429a731"
+//    var customerName = "milapp"
+//    var db = s.GetInstance("crm")
+//
+//    var cc *core.CustomerContext = &core.CustomerContext{CustomerName: customerName}
+//
+//    cRp := r.NewCustomerRP(cc)
+//    akRp := r.NewApiKeyRP(cc)
+//
+//    // helper function, error should be nil if not print it
+//    enil := func(value interface{}) {
+//        a.True(t, value == nil)
+//        if (value != nil) {
+//            fmt.Println(value)
+//        }
+//    }
+//
+//    // set up db
+//    err = cRp.Install(db)
+//    enil(err)
+//    err = akRp.Install(db)
+//    enil(err)
+//
+//    // save customer
+//    model := &r.Customer{}
+//    model.Id = id
+//    model.CustomerName = customerName
+//    err = cRp.Create(model)
+//    enil(err)
+//
+//    // create api key
+//    ak := &r.ApiKey{}
+//    ak.CustomerName = model.CustomerName
+//    err = akRp.Create(ak)
+//
+//    fmt.Println(ak.ApiKey)
+//}

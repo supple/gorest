@@ -4,6 +4,7 @@ import (
     "github.com/gin-gonic/gin"
     "testing"
     "net/http/httptest"
+    "net/http"
     "github.com/stretchr/testify/assert"
     "fmt"
     "github.com/supple/gorest/core"
@@ -33,7 +34,10 @@ func TestAppApi_Get(t *testing.T) {
     })
 
     // make request
-    req := httptest.NewRequest("GET", path, nil)
+
+    // undefined: httptest.NewRequest in go v1.6
+    //req := httptest.NewRequest("GET", path, nil)
+    req, _ := http.NewRequest("GET", path, nil)
     w := httptest.NewRecorder()
     r.ServeHTTP(w, req)
 
