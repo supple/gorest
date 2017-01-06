@@ -6,20 +6,10 @@ import (
     "github.com/supple/gorest/core"
     "io"
     "encoding/json"
+    "github.com/supple/gorest/model"
 )
 
 const REPO_APP = "crm"
-
-type App struct {
-    CustomerBased `bson:",inline"`
-    Os       string `json:"os" bson:"os"`
-    Name     string `json:"name" bson:"name"`
-    GcmToken string `json:"gcmToken" bson:"gcmToken"`
-    ApnsAuthKey string `json:"apnsAuthKey" bson:"apnsAuthKey"`
-    ApnsTeamId string `json:"apnsTeamId" bson:"apnsTeamId"`
-    ApnsKeyId string `json:"apnsKeyId" bson:"apnsKeyId"`
-}
-
 
 // ### -- App repository
 
@@ -37,7 +27,7 @@ func NewAppRP(cc *core.CustomerContext) *AppRP {
     return rp
 }
 
-func (rp *AppRP) Create(model *App) error {
+func (rp *AppRP) Create(model *model.App) error {
     model.CustomerName = rp.cc.CustomerName
     err := rp.ConstraintsValidation(model)
     if (err != nil) {
@@ -54,20 +44,20 @@ func (rp *AppRP) Create(model *App) error {
 //    return err
 //}
 
-func (rp *AppRP) Update(id string, model *App) error {
+func (rp *AppRP) Update(id string, model *model.App) error {
     model.UpdatedAt = core.GetJodaTime()
     err := rp.gt.Update(id, model)
     return err
 }
 
-func (rp *AppRP) FindOne(id string) (*App, error) {
-    result := &App{}
+func (rp *AppRP) FindOne(id string) (*model.App, error) {
+    result := &model.App{}
     err := rp.gt.FindById(id, result)
     return result, err
 }
 
-func (rp *AppRP) FindOneBy(conditions bson.M) (*App, error) {
-    result := &App{}
+func (rp *AppRP) FindOneBy(conditions bson.M) (*model.App, error) {
+    result := &model.App{}
     err := rp.gt.FindOneBy(conditions, result)
     return result, err
 }
@@ -77,7 +67,7 @@ func (rp *AppRP) Delete(id string) (error) {
     return err
 }
 
-func (rp *AppRP) ConstraintsValidation(model *App) (error) {
+func (rp *AppRP) ConstraintsValidation(model *model.App) (error) {
     var err error
     csRp := NewCustomerRP(rp.cc)
     _, err = csRp.FindOneByName(model.CustomerName)
@@ -96,8 +86,8 @@ func (rp AppRP) CollectionName() string {
 }
 
 
-func AppFromJson(data io.Reader) (*App, error) {
-    obj := &App{}
+func AppFromJson(data io.Reader) (*model.App, error) {
+    obj := &model.App{}
     decoder := json.NewDecoder(data)
     if err := decoder.Decode(obj); err != nil {
         return nil, err
@@ -122,7 +112,7 @@ func (er ValidationError) Error() string {
     }
 }
 
-func ValidateApp(m *App) []*ValidationError {
+func ValidateApp(m *model.App) []*ValidationError {
     var errors []*ValidationError
 
     // os required - one of
@@ -162,10 +152,10 @@ func ValidateApp(m *App) []*ValidationError {
 //    return errors
 //}
 
-func CreateAndroidApp(cc *core.CustomerContext, gcmToken string, id string) (*App, error) {
+func CreateAndroidApp(cc *core.CustomerContext, gcmToken string, id string) (*model.App, error) {
     aRp := NewAppRP(cc)
 
-    app := &App{}
+    app := &model.App{}
     app.Id = id
     app.GcmToken = gcmToken
     app.Os = OS_ANDRIOD

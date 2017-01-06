@@ -4,6 +4,7 @@ import (
     "gopkg.in/mgo.v2"
     "gopkg.in/mgo.v2/bson"
     "github.com/supple/gorest/core"
+    "github.com/supple/gorest/model"
     s "github.com/supple/gorest/storage"
     lc "github.com/supple/gorest/utils"
     "fmt"
@@ -11,12 +12,6 @@ import (
 
 const API_KEY_FIELD string = "apiKey"
 const API_KEY_REPO = "crm"
-
-type ApiKey struct {
-    CustomerBased `bson:",inline"`
-    AppId  string `json:"appId" bson:"appId"`
-    ApiKey string `json:"apiKey" bson:"apiKey"`
-}
 
 // ### -- ApiKey repo
 
@@ -37,7 +32,7 @@ func NewApiKeyRP(cc *core.CustomerContext) *ApiKeyRP {
     return rp
 }
 
-func (rp *ApiKeyRP) Create(model *ApiKey) error {
+func (rp *ApiKeyRP) Create(model *model.ApiKey) error {
     var err error
     model.CustomerName = rp.cc.CustomerName
 
@@ -57,14 +52,14 @@ func (rp *ApiKeyRP) Create(model *ApiKey) error {
     return err
 }
 
-func (rp *ApiKeyRP) FindOne(id string) (*ApiKey, error) {
-    result := &ApiKey{}
+func (rp *ApiKeyRP) FindOne(id string) (*model.ApiKey, error) {
+    result := &model.ApiKey{}
     err := rp.gt.FindById(id, result)
     return result, err
 }
 
-func (rp *ApiKeyRP) FindOneBy(conditions bson.M) (*ApiKey, error) {
-    result := &ApiKey{}
+func (rp *ApiKeyRP) FindOneBy(conditions bson.M) (*model.ApiKey, error) {
+    result := &model.ApiKey{}
     err := rp.gt.FindOneBy(conditions, result)
 
     return result, err
@@ -75,7 +70,7 @@ func (rp *ApiKeyRP) Delete(id string) (error) {
     return err
 }
 
-func (rp *ApiKeyRP) ConstraintsValidation(model *ApiKey) (*Customer, error) {
+func (rp *ApiKeyRP) ConstraintsValidation(model *model.ApiKey) (*model.Customer, error) {
     csRp := NewCustomerRP(rp.cc)
     c, err := csRp.FindOneByName(model.CustomerName)
     if (err == core.ErrNotFound) {
@@ -117,9 +112,9 @@ func Auth(apiKey string, accessTo AccessTo) (*core.CustomerContext, error) {
     return cc, err
 }
 
-func CreateApiKey(cc *core.CustomerContext) (*ApiKey, error) {
+func CreateApiKey(cc *core.CustomerContext) (*model.ApiKey, error) {
     akRp := NewApiKeyRP(cc)
-    ak := &ApiKey{}
+    ak := &model.ApiKey{}
     ak.CustomerName = cc.CustomerName
     err := akRp.Create(ak)
 

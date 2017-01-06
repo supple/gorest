@@ -3,19 +3,14 @@ package resources
 import (
     "testing"
     "github.com/supple/gorest/core"
+    "github.com/supple/gorest/model"
     "github.com/supple/gorest/storage"
     a "github.com/stretchr/testify/assert"
     "fmt"
-    "github.com/supple/gorest/tests"
 )
 
-func init() {
-    // Init storage instances
-    tests.GetTestStorage()
-}
-
 func TestAppRP_Update(t *testing.T) {
-    d := App{}
+    d := model.App{}
 
     m := make(map[string]interface{})
     m["os"] = OS_ANDRIOD
@@ -45,7 +40,7 @@ func TestAppRP_Create(t *testing.T) {
     storage.DropCollection(db, appRp.CollectionName())
 
     // create device on non existing customer
-    app := &App{}
+    app := &model.App{}
     app.Name = "xo"
     app.Os = OS_ANDRIOD
     app.CustomerName = cn

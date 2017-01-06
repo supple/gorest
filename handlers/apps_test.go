@@ -13,13 +13,15 @@ import (
 )
 
 
-func init() {
+func initTest() {
     // Init storage instances
     tests.GetTestStorage()
     resources.CreateCustomer(tests.TEST_CUSTOMER)
 }
 
 func TestAppApi_Get(t *testing.T) {
+    initTest()
+
     //gin.SetMode(gin.TestMode)
     r := gin.New()
     var cc = &core.CustomerContext{ApiKey: "", CustomerName: tests.TEST_CUSTOMER}

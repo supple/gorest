@@ -5,15 +5,11 @@ import (
     "github.com/supple/gorest/core"
     "github.com/stretchr/testify/assert"
     "github.com/supple/gorest/tests"
+    "github.com/supple/gorest/model"
 )
 
-func init() {
-    // Init storage instances
-    tests.GetTestStorage()
-}
-
 func TestDeviceRP_Update(t *testing.T) {
-    d := Device{}
+    d := model.Device{}
 
     m := make(map[string]interface{})
     m["appToken"] = "a"
@@ -37,7 +33,7 @@ func TestDeviceRP_Create(t *testing.T) {
     dRp := NewDeviceRP(cc)
 
     // create device on non existing customer
-    d := &Device{}
+    d := &model.Device{}
     d.AppId = "xo"
     d.CustomerName = cn
     err = dRp.Create(d)

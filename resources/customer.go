@@ -5,15 +5,11 @@ import (
     "gopkg.in/mgo.v2/bson"
     "github.com/supple/gorest/core"
     "github.com/supple/gorest/storage"
+    "github.com/supple/gorest/model"
     lc "github.com/supple/gorest/utils"
 )
 
 const REPO_CUSTOMER = "crm"
-
-type Customer struct {
-    CustomerBased `bson:",inline"`
-	Hash string `json:"hash" bson:"hash"`
-}
 
 // ### -- Customer repo
 
@@ -32,7 +28,7 @@ func NewCustomerRP(cc *core.CustomerContext) *CustomerRP {
     return rp
 }
 
-func (rp *CustomerRP) Create(model *Customer) error {
+func (rp *CustomerRP) Create(model *model.Customer) error {
     _, err := rp.FindOneByName(model.CustomerName)
     if (err != nil) {
         if (err != core.ErrNotFound) {
@@ -56,21 +52,21 @@ func (rp *CustomerRP) Update(id string, model *map[string]interface{}) error {
     return err
 }
 
-func (rp *CustomerRP) FindOne(id string) (*Customer, error) {
-	result := &Customer{}
+func (rp *CustomerRP) FindOne(id string) (*model.Customer, error) {
+	result := &model.Customer{}
     err := rp.gt.FindById(id, result)
 	return result, err
 }
 
-func (rp *CustomerRP) FindOneByName(customerName string) (*Customer, error) {
-	result := &Customer{}
+func (rp *CustomerRP) FindOneByName(customerName string) (*model.Customer, error) {
+	result := &model.Customer{}
     conditions := bson.M{CUSTOMER_NAME_FIELD: customerName}
 	err := rp.gt.FindOneBy(conditions, result)
 	return result, err
 }
 
-func (rp *CustomerRP) FindOneBy(conditions bson.M) (*Customer, error) {
-	result := &Customer{}
+func (rp *CustomerRP) FindOneBy(conditions bson.M) (*model.Customer, error) {
+	result := &model.Customer{}
     err := rp.gt.FindOneBy(conditions, result)
 	return result, err
 }
@@ -84,10 +80,10 @@ func (rp CustomerRP) CollectionName() string {
 	return "Customer"
 }
 
-func CreateCustomer(name string) (*Customer, error) {
+func CreateCustomer(name string) (*model.Customer, error) {
     cc := &core.CustomerContext{CustomerName: name}
     cRp := NewCustomerRP(cc)
-    c := &Customer{}
+    c := &model.Customer{}
     c.CustomerName = name
     err := cRp.Create(c)
     if (err != nil) {

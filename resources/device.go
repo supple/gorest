@@ -3,25 +3,13 @@ package resources
 import (
     "gopkg.in/mgo.v2/bson"
     "github.com/supple/gorest/core"
+    "github.com/supple/gorest/model"
     "github.com/supple/gorest/storage"
     "encoding/json"
     "io"
 )
 
 const REPO_DEVICE = "crm"
-
-// --- ## Device model
-
-type Device struct {
-    CustomerBased `bson:",inline"`
-    AppId      string        `json:"appId" bson:"appId" `
-    AppToken   string        `json:"appToken" bson:"appToken"`
-    AppVersion string         `json:"appVersion" bson:"appVersion"`
-}
-
-func (d *Device) IsValidForUpdate() {
-
-}
 
 // --- ## Device repository
 
@@ -40,7 +28,7 @@ func NewDeviceRP(cc *core.CustomerContext) *DeviceRP {
     return rp
 }
 
-func (rp *DeviceRP) Create(model *Device) error {
+func (rp *DeviceRP) Create(model *model.Device) error {
     model.CustomerName = rp.cc.CustomerName
     model.AppId = rp.cc.AppId
     err := rp.ConstraintsValidation(model)
@@ -58,15 +46,15 @@ func (rp *DeviceRP) Update(id string, model *map[string]interface{}) error {
     return err
 }
 
-func (rp *DeviceRP) FindOne(id string) (*Device, error) {
-    result := &Device{}
+func (rp *DeviceRP) FindOne(id string) (*model.Device, error) {
+    result := model.NewDevice()
     err := rp.gt.FindById(id, result)
 
     return result, err
 }
 
-func (rp *DeviceRP) FindOneBy(conditions bson.M) (*Device, error) {
-    result := &Device{}
+func (rp *DeviceRP) FindOneBy(conditions bson.M) (*model.Device, error) {
+    result := model.NewDevice()
     err := rp.gt.FindOneBy(conditions, result)
     return result, err
 }
@@ -76,8 +64,8 @@ func (rp *DeviceRP) Delete(id string) (error) {
     return err
 }
 
-func DeviceFromJson(data io.Reader) (*Device, error) {
-    obj := &Device{}
+func DeviceFromJson(data io.Reader) (*model.Device, error) {
+    obj := model.NewDevice()
     decoder := json.NewDecoder(data)
     if err := decoder.Decode(obj); err != nil {
         return nil, err
@@ -88,7 +76,7 @@ func DeviceFromJson(data io.Reader) (*Device, error) {
     return obj, nil
 }
 
-func (rp *DeviceRP) ConstraintsValidation(model *Device) (error) {
+func (rp *DeviceRP) ConstraintsValidation(model *model.Device) (error) {
     var err error
     csRp := NewCustomerRP(rp.cc)
     _, err = csRp.FindOneByName(model.CustomerName)

@@ -2,7 +2,6 @@ package resources
 
 import (
 	"github.com/supple/gorest/storage"
-    "github.com/supple/gorest/core"
     "unicode/utf8"
     "bytes"
     "unicode"
@@ -18,21 +17,6 @@ const (
     OS_ANDRIOD = "android"
     OS_IOS = "ios"
 )
-
-// Customer based object
-type CustomerBased struct {
-    Id           string `json:"id,omitempty" bson:"_id"`
-    CustomerName string `json:"customerName" bson:"customerName,omitempty" validate:"required"`
-    CreatedAt    string  `json:"createdAt" bson:"createdAt,omitempty"`
-    UpdatedAt    string  `json:"updatedAt" bson:"updatedAt,omitempty"`
-    DeletedAt    string  `json:"deletedAt,omitempty" bson:"deletedAt,omitempty"`
-}
-
-// Set values on common model fields
-func (model *CustomerBased) SetBasicFields() {
-    model.CreatedAt = core.GetJodaTime()
-    model.UpdatedAt = model.CreatedAt
-}
 
 type Repository interface {
 	Create(db *storage.MongoDB, model interface{}) (error)
