@@ -2,7 +2,6 @@ package model
 
 import "github.com/supple/gorest/core"
 
-
 // Customer based object
 type CustomerBased struct {
     Id           string `json:"id,omitempty" bson:"_id"`

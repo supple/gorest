@@ -8,7 +8,6 @@ dependencies:
     - sudo service mongod restart
   override:
     - go get -u github.com/govend/govend
-    - go get -t -d -v ./...
     - cd ${HOME}/.go_workspace/src/github.com/supple/gorest && govend
 
 test:

@@ -1,9 +1,5 @@
 package model
 
-
-
-// --- ## Device model
-
 type Device struct {
     CustomerBased `bson:",inline"`
     AppId      string        `json:"appId" bson:"appId" `
