@@ -2,8 +2,7 @@ package core
 
 import (
     "gopkg.in/mgo.v2/bson"
-    s "github.com/supple/gorest/storage"
-    lc "github.com/supple/gorest/utils"
+    "github.com/supple/gorest/storage"
     "reflect"
     "gopkg.in/mgo.v2"
     "io"
@@ -33,11 +32,11 @@ type Gateway struct {
     collectionName string
     cc *CustomerContext
     coll *mgo.Collection
-    db *s.MongoDB
+    db *storage.MongoDB
     decorate Adapter
 }
 
-func NewGateway(collectionName string, decorate Adapter, db *s.MongoDB) *Gateway {
+func NewGateway(collectionName string, decorate Adapter, db *storage.MongoDB) *Gateway {
     return &Gateway{collectionName: collectionName, db: db, decorate: decorate}
 }
 
@@ -45,7 +44,7 @@ func (gt *Gateway) Insert(model interface{}) error {
     // generate id
     vDst := reflect.Indirect(reflect.ValueOf(model)).FieldByName("Id")
     if (vDst.Len() == 0) {
-        vDst.SetString(lc.NewId())
+        vDst.SetString(NewId())
     }
 
     coll := gt.db.Coll(gt.collectionName)
@@ -114,7 +113,7 @@ func logQuery(coll *mgo.Collection, query interface{})  {
     Log(fmt.Sprintf("[query] %s, %s", coll.FullName, query))
 }
 
-func handleError(db *s.MongoDB, err error) {
+func handleError(db *storage.MongoDB, err error) {
     if (err == io.EOF) {
         db.Session.Refresh()
     }

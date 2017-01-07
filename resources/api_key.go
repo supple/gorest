@@ -5,8 +5,7 @@ import (
     "gopkg.in/mgo.v2/bson"
     "github.com/supple/gorest/core"
     "github.com/supple/gorest/model"
-    s "github.com/supple/gorest/storage"
-    lc "github.com/supple/gorest/utils"
+    "github.com/supple/gorest/storage"
     "fmt"
 )
 
@@ -18,12 +17,12 @@ const API_KEY_REPO = "crm"
 type ApiKeyRP struct {
     gt *core.Gateway
     cc *core.CustomerContext
-    db *s.MongoDB
+    db *storage.MongoDB
 }
 
 func NewApiKeyRP(cc *core.CustomerContext) *ApiKeyRP {
     rp := &ApiKeyRP{cc:cc}
-    db := s.GetInstance(API_KEY_REPO)
+    db := storage.GetInstance(API_KEY_REPO)
     d := core.EmptyDecorator()
     gt := core.NewGateway(rp.CollectionName(), d, db)
 
@@ -45,7 +44,7 @@ func (rp *ApiKeyRP) Create(model *model.ApiKey) error {
     fmt.Println("OK CUST is")
     // create key if not set
     if (len(model.ApiKey) == 0) {
-        model.ApiKey = fmt.Sprintf("%s-%s", lc.RandString(24), customer.Hash)
+        model.ApiKey = fmt.Sprintf("%s-%s", core.RandString(24), customer.Hash)
     }
     err = rp.gt.Insert(model)
     fmt.Println(model)
@@ -121,7 +120,7 @@ func CreateApiKey(cc *core.CustomerContext) (*model.ApiKey, error) {
     return ak, err
 }
 
-func (rp *ApiKeyRP) Install(db *s.MongoDB) error {
+func (rp *ApiKeyRP) Install(db *storage.MongoDB) error {
     var index mgo.Index
     var err error
 

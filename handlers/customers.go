@@ -4,7 +4,7 @@ import (
     "github.com/gin-gonic/gin"
     "encoding/json"
     "github.com/supple/gorest/core"
-    "github.com/supple/gorest/resources"
+    "github.com/supple/gorest/model"
     "log"
 )
 
@@ -64,7 +64,7 @@ func (api *CustomerApi) Get(c *gin.Context) {
 //}
 //
 func (api *CustomerApi) Post(c *gin.Context) {
-    obj := resources.Customer{}
+    obj := model.Customer{}
     decoder := json.NewDecoder(c.Request.Body)
     if err := decoder.Decode(&obj); err != nil {
         log.Print(err.Error())

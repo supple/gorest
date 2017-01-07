@@ -6,7 +6,6 @@ import (
     "github.com/supple/gorest/core"
     "github.com/supple/gorest/storage"
     "github.com/supple/gorest/model"
-    lc "github.com/supple/gorest/utils"
 )
 
 const REPO_CUSTOMER = "crm"
@@ -39,7 +38,7 @@ func (rp *CustomerRP) Create(model *model.Customer) error {
         //    return err
         //}
 
-        model.Hash = lc.RandString(8)
+        model.Hash = core.RandString(8)
         return rp.gt.Insert(model)
     }
 

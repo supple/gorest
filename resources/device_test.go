@@ -8,6 +8,10 @@ import (
     "github.com/supple/gorest/model"
 )
 
+func initTests ()  {
+    tests.GetTestStorage()
+}
+
 func TestDeviceRP_Update(t *testing.T) {
     d := model.Device{}
 

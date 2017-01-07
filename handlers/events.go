@@ -5,7 +5,6 @@ import (
     "time"
     "github.com/gin-gonic/gin"
     "github.com/supple/gorest/worker"
-    "github.com/supple/gorest/utils"
     "github.com/supple/gorest/events"
     "github.com/supple/gorest/core"
 
@@ -16,7 +15,7 @@ func HandleEvents(c *gin.Context) {
     var e events.Event
 
     c.Bind(&e)
-    e.Id = utils.RandString(12) // xid.New().String()
+    e.Id = core.RandString(12) // xid.New().String()
     e.Time = time.Now().Format("2006-01-02T15:04:05.999Z")
 
     // customer context must exists
