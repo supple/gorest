@@ -73,7 +73,7 @@ func (rp *ApiKeyRP) ConstraintsValidation(model *model.ApiKey) (*model.Customer,
     csRp := NewCustomerRP(rp.cc)
     c, err := csRp.FindOneByName(model.CustomerName)
     if (err == core.ErrNotFound) {
-        return nil, ValidationError{Field: "customerName", Message: "Customer not found: "+model.CustomerName}
+        return nil, core.ValidationError{Field: "customerName", Message: "Customer not found: "+model.CustomerName}
     }
     if (err != nil) {
         return nil, err

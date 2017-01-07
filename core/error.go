@@ -76,3 +76,4 @@ func ErrorMessage(err error, error interface{}) (int, *APIErrors) {
     return apiErrors.Status(), apiErrors
 }
 
+// validation

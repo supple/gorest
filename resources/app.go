@@ -98,33 +98,20 @@ func AppFromJson(data io.Reader) (*model.App, error) {
     return obj, nil
 }
 
-type ValidationError struct {
-    Field   string `json:"field"`
-    Message string `json:"message"`
-}
 
-func (er ValidationError) Error() string {
-    b, err := json.Marshal(er)
-    if err != nil {
-        return ""
-    } else {
-        return string(b)
-    }
-}
-
-func ValidateApp(m *model.App) []*ValidationError {
-    var errors []*ValidationError
+func ValidateApp(m *model.App) []*core.ValidationError {
+    var errors []*core.ValidationError
 
     // os required - one of
     switch m.Os {
     case OS_ANDRIOD, OS_IOS: // ok
     default:
-        errors = append(errors, &ValidationError{Field: "os", Message: "Invalid os value, expected: `ios` or `android`"})
+        errors = append(errors, &core.ValidationError{Field: "os", Message: "Invalid os value, expected: `ios` or `android`"})
     }
 
     // name required
     if len(m.Name) == 0 {
-        errors = append(errors, &ValidationError{Field: "name", Message: "Name cannot be empty"})
+        errors = append(errors, &core.ValidationError{Field: "name", Message: "Name cannot be empty"})
     }
 
     // on update

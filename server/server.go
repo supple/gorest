@@ -29,6 +29,11 @@ func AuthMiddleware(c *gin.Context) {
         c.Writer.Header().Set("Content-Type", "application/json; charset=utf-8")
         c.AbortWithError(ae.Status, ae)
         return
+    case *core.ValidationError:
+        ae := err.(*core.ValidationError)
+        c.Writer.Header().Set("Content-Type", "application/json; charset=utf-8")
+        c.AbortWithError(410, ae)
+        return
     case error:
         c.Writer.Header().Set("Content-Type", "application/json; charset=utf-8")
         c.AbortWithError(500, err)
@@ -66,16 +71,18 @@ func SetupRouter() *gin.Engine {
     {
         v1.POST("/events", handlers.HandleEvents)
 
+        //
         v1.GET("/customers", ca.Get)
         v1.POST("/customers", ca.Post)
 
+        //
         v1.GET("/devices/:id", d.Get)
         v1.POST("/devices", d.Post)
         v1.PATCH("/devices", d.Patch)
 
+        //
         v1.POST("/apps", apps.Create)
         v1.GET("/apps/:id", apps.Get)
-
         v1.GET("/apps", apps.List)
     }
     // customers

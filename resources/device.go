@@ -92,7 +92,8 @@ func (rp *DeviceRP) ConstraintsValidation(model *model.Device) (error) {
     _, err = appRp.FindOne(model.AppId)
     if err == core.ErrNotFound {
         // app_id, App id not set in api key
-        return core.ErrorFrom(core.ErrNotFound,  "App id not set in api key")
+        return &core.ValidationError{Field: "app_id", Message: "App id not set in api key"}
+        //return core.ErrorFrom(core.ErrNotFound,  "App id not set in api key")
     }
     if (err != nil) {
         return err

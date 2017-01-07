@@ -31,7 +31,10 @@ func handleError(err error, c *gin.Context) bool {
         ae := err.(*core.ApiError)
         c.Writer.Header().Set("Content-Type", "application/json; charset=utf-8")
         c.AbortWithError(ae.Status, ae)
-
+    case *core.ValidationError:
+        ae := err.(*core.ValidationError)
+        c.Writer.Header().Set("Content-Type", "application/json; charset=utf-8")
+        c.AbortWithError(410, ae)
     case error:
         c.Writer.Header().Set("Content-Type", "application/json; charset=utf-8")
         c.AbortWithError(500, err)
