@@ -30,9 +30,9 @@ func InitCache(app *core.AppServices) {
 }
 
 func initServices() {
-    // Init storage instances
-    storage.SetInstance("crm", storage.NewMongoDB("192.168.1.106:27017", "crm"))
-    storage.SetInstance("events", storage.NewMongoDB("192.168.1.106:27017", "events"))
+    // Init storage instances: 192.168.1.106 mongo-crm
+    storage.SetInstance("crm", storage.NewMongoDB("mongo-crm:27017", "crm"))
+    storage.SetInstance("events", storage.NewMongoDB("mongo-evens:27017", "events"))
 
     // Create the job queue.
     var maxQueueSize = 3
