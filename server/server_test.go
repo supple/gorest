@@ -41,5 +41,5 @@ func TestDeviceHandler_Update(t *testing.T) {
 
 	resp := httptest.NewRecorder()
 	testRouter.ServeHTTP(resp, req)
-	a.Equal(t, "{\"error\":\"Object not found\"}\n", resp.Body.String())
+	a.Equal(t, "{\"error\":\"Object not found\"}", resp.Body.String())
 }

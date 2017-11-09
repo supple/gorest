@@ -42,6 +42,6 @@ func TestIntegration_Apps_Get(t *testing.T) {
 	fmt.Println(resp)
 	assert.Equal(t, 200, w.Code)
 
-	expected := fmt.Sprintf("{\"createdAt\":\"%s\",\"id\":\"abc\",\"name\":\"\",\"updatedAt\":\"%s\"}\n", app.CreatedAt, app.UpdatedAt)
+	expected := fmt.Sprintf("{\"createdAt\":\"%s\",\"id\":\"abc\",\"name\":\"\",\"updatedAt\":\"%s\"}", app.CreatedAt, app.UpdatedAt)
 	assert.Equal(t, expected, resp)
 }
