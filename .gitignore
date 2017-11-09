@@ -1,7 +1,12 @@
 .idea/
 test.go
-vendor/*
 build/*
 auth/
+toys/
 gorest
+gorest.*
 vendor/
+conf.d/app.json
+
+cmd/*
+
