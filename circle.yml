@@ -11,7 +11,7 @@ dependencies:
     - mkdir -p ~/.go_project/src/github.com/${CIRCLE_PROJECT_USERNAME}
     - ln -s ${HOME}/${CIRCLE_PROJECT_REPONAME} ${HOME}/.go_project/src/github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}
     - go get -u github.com/govend/govend
-    - cd ${HOME}/.go_project/src/github.com/supple/gorest && govend
+    - cd ${HOME}/${CIRCLE_PROJECT_REPONAME} && govend
 
 test:
   override:
