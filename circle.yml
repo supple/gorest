@@ -8,8 +8,8 @@ dependencies:
     - sudo service mongod restart
   override:
     - go get -u github.com/govend/govend
-    - cd ${HOME}/.go_workspace/src/github.com/supple/gorest && govend
+    - cd ${HOME}/.go_project/src/github.com/supple/gorest && govend
 
 test:
   override:
-    - cd ${HOME}/.go_workspace/src/github.com/supple/gorest && go test -v -race $(go list ./... | grep -v /vendor/)
+    - cd ${HOME}/.go_project/src/github.com/supple/gorest && go test -v -race $(go list ./... | grep -v /vendor/)
