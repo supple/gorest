@@ -1,10 +1,10 @@
 ##Rest api using Goji
 
 ###Build docker container
-docker build -t sv-mtest .
+docker build -t sv-gorest .
 
 ###Start docker container
-docker run -it --rm -p 10100:8000  sv-mtest
+docker run -it --rm -p 10100:8000  sv-gorest
 
 ##Dependencies
 
