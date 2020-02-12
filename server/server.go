@@ -53,9 +53,9 @@ func SetupRouter() *gin.Engine {
 	// set middleware
 	//r.Use(gzip.Gzip(gzip.DefaultCompression))
 	//r.Use(CORSMiddleware())
+	r.Use(gin.Logger())
 	r.Use(gin.Recovery())
 	r.Use(ErrorHandler)
-	r.Use(gin.Logger())
 	r.Use(AuthMiddleware)
 
 	// api handlers
